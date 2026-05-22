@@ -1,0 +1,116 @@
+import Link from 'next/link'
+
+const HOT_SEARCHES = ['IKEA 沙发', '搬家甩卖', '自行车', 'MacBook', '中文书', '免费送']
+
+export default function Hero() {
+  return (
+    <section className="max-w-[1360px] mx-auto px-4 md:px-16 pt-12 md:pt-[72px] pb-8 grid md:grid-cols-[1.1fr_0.9fr] gap-10 md:gap-14 items-center">
+      {/* LEFT */}
+      <div>
+        <div className="font-mono text-[12px] tracking-[0.18em] text-brand-muted uppercase mb-7 font-medium">
+          OVERSEAS · 海外华人邻里社区
+        </div>
+
+        {/* h1: bolder hierarchy — weight 700 + tighter tracking + extra letter spacing punch */}
+        {/* H1 with stagger entry — first line fades in, then second line, then highlight auto-draws */}
+        <h1 className="font-serif font-bold text-[56px] md:text-[104px] leading-[0.98] tracking-[-0.025em] text-brand-ink m-0">
+          <span className="inline-block opacity-0 animate-[pf-rise_0.7s_cubic-bezier(0.25,1,0.5,1)_0.05s_forwards]">
+            你不要的，
+          </span>
+          <br />
+          <span className="inline-block opacity-0 animate-[pf-rise_0.7s_cubic-bezier(0.25,1,0.5,1)_0.25s_forwards]">
+            <span className="hero-highlight">正好有人要</span>
+          </span>
+        </h1>
+
+        {/* search */}
+        <form
+          action="/browse"
+          role="search"
+          className="mt-9 flex items-center border border-brand-ink rounded-pill pl-6 pr-1.5 py-1.5 max-w-[520px] bg-white focus-within:ring-2 focus-within:ring-brand-yellow focus-within:ring-offset-2"
+        >
+          <label htmlFor="hero-search" className="sr-only">
+            搜索闲置 · 师傅 · 搭子
+          </label>
+          <svg
+            className="w-[18px] h-[18px] text-brand-muted mr-3 shrink-0"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="2"
+            strokeLinecap="round"
+            aria-hidden
+          >
+            <circle cx="11" cy="11" r="7" />
+            <line x1="21" y1="21" x2="16.5" y2="16.5" />
+          </svg>
+          <input
+            id="hero-search"
+            name="q"
+            aria-label="搜索闲置、师傅、搭子"
+            placeholder="搜沙发 · 找翻译 · 约球友 · 免费送…"
+            className="flex-1 bg-transparent py-3 text-[14px] text-brand-ink outline-none placeholder:text-[#999]"
+          />
+          <button
+            type="submit"
+            className="bg-brand-ink text-white rounded-pill min-w-[64px] min-h-[44px] px-7 py-3 text-[13px] font-medium hover:opacity-85 active:translate-y-px transition-all duration-150"
+          >
+            搜索
+          </button>
+        </form>
+
+        <div className="flex gap-6 mt-6 items-center">
+          <Link
+            href="/browse"
+            className="text-[14px] text-[#444] underline underline-offset-4 hover:text-brand-ink transition-colors"
+          >
+            去逛逛 →
+          </Link>
+        </div>
+
+        <div className="mt-9 font-mono text-[11px] text-brand-muted tracking-[0.18em] uppercase">— popular</div>
+        <div className="flex flex-wrap gap-2 mt-3">
+          {HOT_SEARCHES.map((q) => (
+            <Link
+              key={q}
+              href={`/browse?q=${encodeURIComponent(q)}`}
+              className="text-[12px] py-1.5 px-3.5 border border-brand-line-3 rounded-pill text-brand-ink-soft hover:border-brand-ink hover:text-brand-ink transition-colors"
+            >
+              {q}
+            </Link>
+          ))}
+        </div>
+      </div>
+
+      {/* RIGHT — video placeholder (1:1) */}
+      <div className="relative aspect-square bg-brand-cream rounded-3xl border border-brand-line overflow-hidden">
+        <span className="absolute top-5 right-5 z-10 text-[11px] py-1.5 px-3 bg-brand-ink text-brand-yellow rounded-pill font-mono tracking-[0.1em]">
+          [ video.coming ]
+        </span>
+        <span className="absolute bottom-5 left-5 z-10 text-[11px] font-mono text-brand-muted-soft tracking-[0.1em]">
+          // hero video — 待用户提供链接
+        </span>
+        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-brand-muted-soft">
+          <svg
+            width="56"
+            height="56"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+            className="opacity-50"
+          >
+            <polygon points="23 7 16 12 23 17 23 7" />
+            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
+          </svg>
+          <span className="text-[13px] font-mono tracking-[0.08em]">
+            Hero 视频位 · 待插入
+          </span>
+        </div>
+      </div>
+    </section>
+  )
+}

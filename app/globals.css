@@ -1,0 +1,131 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html { -webkit-tap-highlight-color: transparent; scroll-behavior: smooth; }
+  body { font-feature-settings: 'palt'; letter-spacing: -0.005em; }
+  button { -webkit-tap-highlight-color: transparent; }
+
+  /* ui-ux-pro-max guideline: visible focus on all interactive elements */
+  :focus-visible {
+    outline: 2px solid #F4C300;
+    outline-offset: 2px;
+    border-radius: 4px;
+  }
+
+  /* ui-ux-pro-max guideline: respect reduced-motion */
+  @media (prefers-reduced-motion: reduce) {
+    *, *::before, *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+      scroll-behavior: auto !important;
+    }
+  }
+}
+
+@layer components {
+  .container-page { @apply max-w-6xl mx-auto px-4 md:px-6; }
+  .card { @apply bg-white rounded-2xl shadow-card overflow-hidden; }
+  .chip { @apply inline-flex items-center px-2.5 py-1 rounded-full text-xs font-medium; }
+}
+
+@layer utilities {
+  .no-scrollbar::-webkit-scrollbar { display: none; }
+  .no-scrollbar { scrollbar-width: none; }
+
+  /* Subtle reveal — used by ScrollReveal client component via state classes,
+     and the CSS-only fallback `.pf-rise` for static stagger entries. */
+  @keyframes pf-rise {
+    from { opacity: 0; transform: translateY(8px); }
+    to   { opacity: 1; transform: translateY(0); }
+  }
+  .pf-rise {
+    animation: pf-rise 0.5s cubic-bezier(0.25, 1, 0.5, 1) both;
+  }
+
+  /* Hero yellow highlight draws itself left → right on first paint */
+  @keyframes hero-highlight-draw {
+    from { background-size: 0% 100%; }
+    to   { background-size: 100% 100%; }
+  }
+  .hero-highlight {
+    background-image: linear-gradient(180deg, transparent 60%, #F4C300 60%, #F4C300 92%, transparent 92%);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: 100% 100%;
+    animation: hero-highlight-draw 1.2s cubic-bezier(0.25, 1, 0.5, 1) 0.45s both;
+    padding-inline: 0.25rem;
+  }
+  @media (prefers-reduced-motion: reduce) {
+    .hero-highlight { animation: none; }
+  }
+
+  /* Static highlighter for section titles — same visual as hero-highlight but
+     without the entry animation (multiple highlights animating simultaneously
+     on page load is distracting). Black text + yellow bar from 55% to 95%
+     gives a thick, confident highlighter stroke that reads on white. */
+  .text-highlight-yellow {
+    background-image: linear-gradient(180deg, transparent 55%, #F4C300 55%, #F4C300 95%, transparent 95%);
+    background-repeat: no-repeat;
+    background-position: 0 0;
+    background-size: 100% 100%;
+    padding-inline: 0.25rem;
+  }
+
+  /* Soft attention pulse for "缺位" pills, FREE stamp etc */
+  @keyframes soft-pulse {
+    0%, 100% { transform: scale(1);   opacity: 1; }
+    50%      { transform: scale(1.06); opacity: 0.92; }
+  }
+  .pulse-soft {
+    animation: soft-pulse 2.4s ease-in-out infinite;
+  }
+
+  /* One-shot stamp impact for FREE chip on first entry into viewport */
+  @keyframes stamp-impact {
+    0%   { transform: scale(2) rotate(-12deg); opacity: 0; }
+    70%  { transform: scale(0.92) rotate(2deg); opacity: 1; }
+    100% { transform: scale(1) rotate(0); opacity: 1; }
+  }
+  .stamp-impact {
+    animation: stamp-impact 0.6s cubic-bezier(0.25, 1, 0.5, 1) both;
+  }
+
+  /* Underline draw for any anchor that wants it */
+  @keyframes underline-draw {
+    from { background-size: 0% 1px; }
+    to   { background-size: 100% 1px; }
+  }
+
+  /* Logo dot — barely-there breath every few seconds */
+  @keyframes brand-breath {
+    0%, 92%, 100% { transform: translateY(-2px) scale(1); }
+    96%           { transform: translateY(-2px) scale(1.25); }
+  }
+  .brand-breath { animation: brand-breath 6s ease-in-out infinite; }
+
+  /* Marquee scroll — defined here as a safety net in case the Tailwind
+     animation config doesn't get picked up on a hot reload. The class name
+     matches the `animate-marquee` Tailwind would generate, so either source
+     of the rule works. */
+  @keyframes marquee {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-100%); }
+  }
+  .animate-marquee {
+    animation: marquee 42s linear infinite;
+  }
+
+  /* Diagonal announcement marquee — used with duplicated content (two copies
+     in one flex row). Sliding -50% places the second copy exactly where the
+     first began, giving a seamless infinite loop with no visible seam. */
+  @keyframes marquee-loop {
+    from { transform: translateX(0); }
+    to   { transform: translateX(-50%); }
+  }
+  .animate-marquee-loop {
+    animation: marquee-loop 50s linear infinite;
+  }
+}

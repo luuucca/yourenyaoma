@@ -1,0 +1,44 @@
+# Dependencies
+node_modules
+
+# Next.js
+.next
+out
+.vercel
+
+# Secrets — NEVER commit (Supabase service_role key etc)
+.env
+.env.local
+.env*.local
+.env.production
+
+# Logs
+*.log
+dev.log
+dev.err.log
+npm-debug.log*
+
+# OS / IDE
+.DS_Store
+.idea
+.vscode/*
+!.vscode/extensions.json
+Thumbs.db
+
+# Build artifacts
+next-env.d.ts
+tsconfig.tsbuildinfo
+
+# Local-only Claude Code skill installs (per-developer, not project state).
+# Bundling impeccable + ui-ux-pro-max + web-design skill files (~50MB) bloats
+# the repo and they reinstall per-developer anyway. Comment out if you want
+# to share them.
+.claude/skills/
+.agents/
+
+# Restore script left over from the May 2026 system rebuild
+restore-youren-yaoma.ps1
+
+# Design handoff bundle — 26MB of PNG references from Claude Design export.
+# Useful as a visual source-of-truth but heavy.
+_design_handoff/
