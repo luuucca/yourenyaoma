@@ -106,8 +106,8 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* RIGHT — TrueFocus 品牌主张：「你不要」/「我要」焦点切换 */}
-      <div className="relative aspect-square bg-brand-cream rounded-3xl border border-brand-line overflow-hidden flex items-center justify-center p-8">
+      {/* RIGHT — TrueFocus 品牌主张：「你不要」/「我要」焦点切换；裸放在白底，黄边角即视觉锚点 */}
+      <div className="relative aspect-square flex items-center justify-center p-8">
         <div className="font-serif font-bold text-[52px] md:text-[96px] text-brand-ink leading-none">
           <TrueFocus
             sentence="你不要，我要"
@@ -119,9 +119,6 @@ export default function Hero() {
             blurAmount={6}
           />
         </div>
-        <span className="absolute bottom-5 right-5 z-10 text-[11px] font-mono text-brand-muted-soft tracking-[0.1em]">
-          // 二手交易的本质
-        </span>
       </div>
     </section>
   )
