@@ -1,4 +1,6 @@
 import Link from 'next/link'
+import SplitText from '@/components/SplitText'
+import Magnet from '@/components/Magnet'
 
 const HOT_SEARCHES = ['IKEA 沙发', '搬家甩卖', '自行车', 'MacBook', '中文书', '免费送']
 
@@ -11,15 +13,34 @@ export default function Hero() {
           OVERSEAS · 海外华人邻里社区
         </div>
 
-        {/* h1: bolder hierarchy — weight 700 + tighter tracking + extra letter spacing punch */}
-        {/* H1 with stagger entry — first line fades in, then second line, then highlight auto-draws */}
+        {/* H1: per-char stagger entry via SplitText (GSAP). Line 2 keeps the */}
+        {/* yellow highlighter — background-image animation draws behind the */}
+        {/* chars as they fall into place. */}
         <h1 className="font-serif font-bold text-[56px] md:text-[104px] leading-[0.98] tracking-[-0.025em] text-brand-ink m-0">
-          <span className="inline-block opacity-0 animate-[pf-rise_0.7s_cubic-bezier(0.25,1,0.5,1)_0.05s_forwards]">
-            你不要的，
-          </span>
-          <br />
-          <span className="inline-block opacity-0 animate-[pf-rise_0.7s_cubic-bezier(0.25,1,0.5,1)_0.25s_forwards]">
-            <span className="hero-highlight">正好有人要</span>
+          <SplitText
+            text="你不要的，"
+            tag="span"
+            splitType="chars"
+            delay={45}
+            duration={0.7}
+            ease="power3.out"
+            from={{ opacity: 0, y: 40 }}
+            to={{ opacity: 1, y: 0 }}
+            textAlign="left"
+            className="!block"
+          />
+          <span className="hero-highlight inline-block">
+            <SplitText
+              text="正好有人要"
+              tag="span"
+              splitType="chars"
+              delay={50}
+              duration={0.7}
+              ease="power3.out"
+              from={{ opacity: 0, y: 40 }}
+              to={{ opacity: 1, y: 0 }}
+              textAlign="left"
+            />
           </span>
         </h1>
 
@@ -51,12 +72,14 @@ export default function Hero() {
             placeholder="搜沙发 · 找翻译 · 约球友 · 免费送…"
             className="flex-1 bg-transparent py-3 text-[14px] text-brand-ink outline-none placeholder:text-[#999]"
           />
-          <button
-            type="submit"
-            className="bg-brand-ink text-white rounded-pill min-w-[64px] min-h-[44px] px-7 py-3 text-[13px] font-medium hover:opacity-85 active:translate-y-px transition-all duration-150"
-          >
-            搜索
-          </button>
+          <Magnet padding={70} magnetStrength={5} wrapperClassName="shrink-0">
+            <button
+              type="submit"
+              className="bg-brand-ink text-white rounded-pill min-w-[64px] min-h-[44px] px-7 py-3 text-[13px] font-medium hover:opacity-85 active:translate-y-px transition-all duration-150"
+            >
+              搜索
+            </button>
+          </Magnet>
         </form>
 
         <div className="flex gap-6 mt-6 items-center">

@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import AnnouncementMarquee from './AnnouncementMarquee'
+import ShinyPublishCTA from './ShinyPublishCTA'
 
 const NAV_ITEMS = [
   { href: '/', label: '首页' },
@@ -57,12 +58,7 @@ export default async function Header() {
                 登录
               </Link>
             )}
-            <Link
-              href="/publish"
-              className="bg-brand-ink text-white rounded-pill px-[22px] py-[10px] text-[13px] font-medium hover:opacity-85 active:translate-y-px transition-all duration-150 whitespace-nowrap"
-            >
-              发布闲置
-            </Link>
+            <ShinyPublishCTA />
           </div>
         </div>
       </header>
