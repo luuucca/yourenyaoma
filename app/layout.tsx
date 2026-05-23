@@ -29,14 +29,49 @@ const mono = JetBrains_Mono({
   display: 'swap',
 })
 
+const siteName = '有人要吗'
+const siteTitle = '有人要吗 — 海外华人邻里社区'
+const siteDescription =
+  '你不要的，正好有人要。海外华人邻里社区 — 一个平台解决三件事：闲置二手、靠谱师傅、同城搭子。'
+const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
+
 export const metadata: Metadata = {
-  title: { default: '有人要吗 — 维也纳华人二手闲置交易平台', template: '%s · 有人要吗' },
-  description: '你不要的，正好有人要。维也纳本地华人二手闲置发布、浏览、自取交易平台。',
+  metadataBase: new URL(siteUrl),
+  title: { default: siteTitle, template: '%s · 有人要吗' },
+  description: siteDescription,
+  applicationName: siteName,
+  keywords: ['海外华人', '二手闲置', '邻里社区', '找师傅', '找搭子', '柏林', '维也纳', '慕尼黑'],
+  authors: [{ name: 'LUUUCCA' }],
   openGraph: {
-    title: '有人要吗 — 维也纳华人二手闲置交易平台',
-    description: '你不要的，正好有人要。',
+    title: siteTitle,
+    description: siteDescription,
     type: 'website',
     locale: 'zh_CN',
+    siteName,
+    images: [
+      {
+        url: '/og.png',
+        width: 1200,
+        height: 630,
+        alt: siteTitle,
+      },
+    ],
+  },
+  twitter: {
+    card: 'summary_large_image',
+    title: siteTitle,
+    description: siteDescription,
+    images: ['/og.png'],
+  },
+  icons: {
+    icon: [
+      { url: '/favicon.svg', type: 'image/svg+xml' },
+    ],
+    apple: '/apple-touch-icon.png',
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
 }
 

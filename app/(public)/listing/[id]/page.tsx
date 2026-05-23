@@ -5,8 +5,10 @@ import { ListingGallery } from '@/components/listing/ListingGallery'
 import { ContactReveal } from '@/components/listing/ContactReveal'
 import { FavoriteButton } from '@/components/listing/FavoriteButton'
 import { ReportDialog } from '@/components/listing/ReportDialog'
+import ShareButton from '@/components/listing/ShareButton'
 import OfferDialog from '@/components/listing/OfferDialog'
 import OfferChain, { type ChainOffer } from '@/components/listing/OfferChain'
+import { MyListingActions } from '@/components/user/MyListingActions'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
 import { formatPrice } from '@/lib/utils/formatPrice'
@@ -129,12 +131,9 @@ export default async function ListingDetailPage({
 
         {isOwner ? (
           <>
-            <div className="mt-4 flex gap-2">
-              <Link href="/me/listings" className="flex-1">
-                <Button variant="secondary" className="w-full">
-                  管理我的发布
-                </Button>
-              </Link>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <ShareButton title={listing.title} path={`/listing/${listing.id}`} />
+              <MyListingActions listingId={listing.id} status={listing.status} />
             </div>
             {/* Seller side: same compact placement so they can respond to
                 buyer offers without scrolling past the description. */}
@@ -159,13 +158,14 @@ export default async function ListingDetailPage({
                 initialFavorited={isFavorited}
                 loggedIn={!!user}
               />
-              {Number(listing.price) > 0 && !hasActiveOffer && (
+              {Number(listing.price) > 0 && !hasActiveOffer && listing.status === 'published' && (
                 <OfferDialog
                   listingId={listing.id}
                   listingPrice={Number(listing.price)}
                   loggedIn={!!user}
                 />
               )}
+              <ShareButton title={listing.title} path={`/listing/${listing.id}`} />
               <ReportDialog listingId={listing.id} />
             </div>
             {/* Offer chain renders directly under the action buttons so the

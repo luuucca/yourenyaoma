@@ -22,26 +22,37 @@ export default async function MePage() {
     .single()
 
   // Run all the counts in parallel
-  const [{ count: listingCount }, { count: favoriteCount }, { count: hostingCount }, { count: joinedCount }] =
-    await Promise.all([
-      supabase
-        .from('listings')
-        .select('id', { count: 'exact', head: true })
-        .eq('user_id', user.id),
-      supabase
-        .from('favorites')
-        .select('listing_id', { count: 'exact', head: true })
-        .eq('user_id', user.id),
-      supabase
-        .from('hangouts')
-        .select('id', { count: 'exact', head: true })
-        .eq('host_id', user.id),
-      supabase
-        .from('hangout_participants')
-        .select('hangout_id', { count: 'exact', head: true })
-        .eq('user_id', user.id)
-        .eq('status', 'joined'),
-    ])
+  const [
+    { count: listingCount },
+    { count: favoriteCount },
+    { count: hostingCount },
+    { count: joinedCount },
+    { count: offerCount },
+  ] = await Promise.all([
+    supabase
+      .from('listings')
+      .select('id', { count: 'exact', head: true })
+      .eq('user_id', user.id),
+    supabase
+      .from('favorites')
+      .select('listing_id', { count: 'exact', head: true })
+      .eq('user_id', user.id),
+    supabase
+      .from('hangouts')
+      .select('id', { count: 'exact', head: true })
+      .eq('host_id', user.id),
+    supabase
+      .from('hangout_participants')
+      .select('hangout_id', { count: 'exact', head: true })
+      .eq('user_id', user.id)
+      .eq('status', 'joined'),
+    // pending offers involving viewer (as buyer OR seller) — rough "unread" count
+    supabase
+      .from('price_offers')
+      .select('id', { count: 'exact', head: true })
+      .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`)
+      .eq('status', 'pending'),
+  ])
 
   return (
     <div className="container-page py-6 max-w-2xl">
@@ -98,6 +109,19 @@ export default async function MePage() {
           <span className="text-2xl mb-1">🤝</span>
           <span className="font-medium">我加入的活动</span>
           <span className="text-xs text-brand-muted">{joinedCount ?? 0} 场</span>
+        </Link>
+        <Link
+          href="/me/offers"
+          className={
+            'card p-4 flex flex-col items-center justify-center hover:shadow-lg transition col-span-2 ' +
+            ((offerCount ?? 0) > 0 ? 'border-2 border-brand-yellow' : '')
+          }
+        >
+          <span className="text-2xl mb-1">🪓</span>
+          <span className="font-medium">砍价记录</span>
+          <span className="text-xs text-brand-muted">
+            {(offerCount ?? 0) > 0 ? `${offerCount} 条等回应` : '暂无未读'}
+          </span>
         </Link>
       </div>
 

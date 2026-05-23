@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 64 64">
+  <!-- 有人要吗? — minimal favicon: black square with yellow `?` brand mark -->
+  <rect width="64" height="64" rx="14" fill="#0d0d0d"/>
+  <text
+    x="50%"
+    y="50%"
+    text-anchor="middle"
+    dominant-baseline="central"
+    font-family="Noto Serif SC, serif"
+    font-weight="800"
+    font-size="44"
+    fill="#F4C300"
+  >要</text>
+</svg>
