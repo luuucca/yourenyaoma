@@ -1,6 +1,7 @@
 import Link from 'next/link'
 import SplitText from '@/components/SplitText'
 import Magnet from '@/components/Magnet'
+import TrueFocus from '@/components/TrueFocus'
 
 const HOT_SEARCHES = ['IKEA 沙发', '搬家甩卖', '自行车', 'MacBook', '中文书', '免费送']
 
@@ -105,34 +106,22 @@ export default function Hero() {
         </div>
       </div>
 
-      {/* RIGHT — video placeholder (1:1) */}
-      <div className="relative aspect-square bg-brand-cream rounded-3xl border border-brand-line overflow-hidden">
-        <span className="absolute top-5 right-5 z-10 text-[11px] py-1.5 px-3 bg-brand-ink text-brand-yellow rounded-pill font-mono tracking-[0.1em]">
-          [ video.coming ]
-        </span>
-        <span className="absolute bottom-5 left-5 z-10 text-[11px] font-mono text-brand-muted-soft tracking-[0.1em]">
-          // hero video — 待用户提供链接
-        </span>
-        <div className="absolute inset-0 flex flex-col items-center justify-center gap-4 text-brand-muted-soft">
-          <svg
-            width="56"
-            height="56"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
-            className="opacity-50"
-          >
-            <polygon points="23 7 16 12 23 17 23 7" />
-            <rect x="1" y="5" width="15" height="14" rx="2" ry="2" />
-          </svg>
-          <span className="text-[13px] font-mono tracking-[0.08em]">
-            Hero 视频位 · 待插入
-          </span>
+      {/* RIGHT — TrueFocus 品牌主张：「你不要」/「我要」焦点切换 */}
+      <div className="relative aspect-square bg-brand-cream rounded-3xl border border-brand-line overflow-hidden flex items-center justify-center p-8">
+        <div className="font-serif font-bold text-[52px] md:text-[96px] text-brand-ink leading-none">
+          <TrueFocus
+            sentence="你不要，我要"
+            separator="，"
+            borderColor="#F4C300"
+            glowColor="rgba(244, 195, 0, 0.55)"
+            animationDuration={1.1}
+            pauseBetweenAnimations={1.6}
+            blurAmount={6}
+          />
         </div>
+        <span className="absolute bottom-5 right-5 z-10 text-[11px] font-mono text-brand-muted-soft tracking-[0.1em]">
+          // 二手交易的本质
+        </span>
       </div>
     </section>
   )
