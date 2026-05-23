@@ -2,7 +2,6 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import AnnouncementMarquee from './AnnouncementMarquee'
 import ShinyPublishCTA from './ShinyPublishCTA'
-import GradientText from '@/components/GradientText'
 
 const NAV_ITEMS = [
   { href: '/', label: '首页' },
@@ -27,17 +26,9 @@ export default async function Header() {
         <div className="max-w-[1360px] mx-auto flex items-center px-4 md:px-16 py-5 md:py-7 gap-6 md:gap-12">
           <Link
             href="/"
-            className="font-serif font-bold text-[22px] tracking-[-0.01em] inline-flex items-baseline gap-1.5 whitespace-nowrap"
+            className="font-serif font-bold text-[22px] tracking-[-0.01em] text-brand-ink inline-flex items-baseline gap-1.5 whitespace-nowrap"
           >
-            {/* 三色 brand 渐变：ink 黑 → 品牌黄 → 暖焰红，yoyo 平滑往返 6s 一轮 */}
-            <GradientText
-              colors={['#0d0d0d', '#F4C300', '#E03E3E']}
-              animationSpeed={6}
-              direction="horizontal"
-              yoyo
-            >
-              有人要吗
-            </GradientText>
+            有人要吗
             {/* Brand dot — subtle "breath" every few seconds keeps the logo alive */}
             <span className="w-2 h-2 rounded-sm bg-brand-yellow inline-block brand-breath motion-reduce:animate-none" aria-hidden />
           </Link>
