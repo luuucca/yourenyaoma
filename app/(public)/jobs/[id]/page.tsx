@@ -34,10 +34,10 @@ export default async function JobDetailPage({ params }: { params: { id: string }
   const isOwner = user?.id === job.user_id
   const isClosed = job.status === 'closed'
 
-  // 拉发布者的 nickname 单独查（避免 FK embed 歧义）
+  // 拉发布者的 nickname + 联系方式（联系方式以 profile 为准）
   const { data: profile } = await supabase
     .from('profiles')
-    .select('nickname')
+    .select('nickname, wechat, whatsapp')
     .eq('id', job.user_id)
     .maybeSingle()
 
@@ -79,22 +79,20 @@ export default async function JobDetailPage({ params }: { params: { id: string }
         <h3 className="font-serif text-[18px] font-bold text-brand-ink mb-3">联系方式</h3>
         {user ? (
           <div className="space-y-2">
-            {job.contact_wechat && (
-              <ContactRow label="微信" value={job.contact_wechat} />
+            {profile?.wechat && (
+              <ContactRow label="微信" value={profile.wechat} />
             )}
-            {job.contact_whatsapp && (
+            {profile?.whatsapp && (
               <ContactRow
                 label="WhatsApp"
-                value={job.contact_whatsapp}
-                href={`https://wa.me/${job.contact_whatsapp.replace(/[^0-9+]/g, '')}`}
+                value={profile.whatsapp}
+                href={`https://wa.me/${profile.whatsapp.replace(/[^0-9+]/g, '')}`}
               />
             )}
-            {job.contact_email && (
-              <ContactRow
-                label="邮箱"
-                value={job.contact_email}
-                href={`mailto:${job.contact_email}`}
-              />
+            {!profile?.wechat && !profile?.whatsapp && (
+              <div className="text-[13px] text-brand-muted py-3">
+                这位发布者还没填联系方式。
+              </div>
             )}
             <p className="text-[11px] text-brand-muted leading-relaxed pt-3 border-t border-brand-line">
               提示：见面优先公共场所。试岗工资按约定结算，不要预付任何「保证金」。

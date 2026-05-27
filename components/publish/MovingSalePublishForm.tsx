@@ -1,11 +1,14 @@
 'use client'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import Image from 'next/image'
 import { useRouter } from 'next/navigation'
 import { Input, Textarea } from '@/components/ui/Input'
 import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
+import { createClient } from '@/lib/supabase/client'
+import { compressImage } from '@/lib/utils/compressImage'
 import { ImageUploader } from './ImageUploader'
 import { CATEGORIES } from '@/lib/constants/categories'
 import { CONDITIONS } from '@/lib/constants/conditions'
@@ -20,6 +23,7 @@ type ItemDraft = {
   priceText: string // 空字符串 = bundle_only
   category: string
   condition: string
+  imagePath: string // 空 = 没图
 }
 
 function newItem(): ItemDraft {
@@ -30,6 +34,7 @@ function newItem(): ItemDraft {
     priceText: '',
     category: 'furniture',
     condition: '80',
+    imagePath: '',
   }
 }
 
@@ -49,8 +54,8 @@ export function MovingSalePublishForm({
   const [pickup, setPickup] = useState(true)
   const [parentImages, setParentImages] = useState<string[]>([])
 
-  // 子物品
-  const [items, setItems] = useState<ItemDraft[]>([newItem()])
+  // 子物品 — 默认 0 件，用户按需添加
+  const [items, setItems] = useState<ItemDraft[]>([])
   const [err, setErr] = useState<string | null>(null)
   const [loading, setLoading] = useState(false)
 
@@ -84,6 +89,7 @@ export function MovingSalePublishForm({
         category: it.category,
         condition: it.condition,
         bundle_only: it.priceText === '',
+        image_path: it.imagePath || undefined,
       })),
     }
     const result = await publishMovingSale(payload as any)
@@ -161,16 +167,25 @@ export function MovingSalePublishForm({
         </label>
       </section>
 
-      {/* ============================= 子物品列表 ============================= */}
+      {/* ============================= 子物品列表 (可选) ============================= */}
       <section className="space-y-3">
         <div className="flex items-baseline justify-between">
           <div className="text-[12px] font-mono tracking-[0.18em] text-brand-muted uppercase">
-            ② 物品清单 ({items.length})
+            ② 物品清单 ({items.length}) · 选填
           </div>
-          <span className="text-[11px] text-brand-muted">
-            {individualCount} 件单独售 · {bundleOnlyCount} 件仅在套装内
-          </span>
+          {items.length > 0 && (
+            <span className="text-[11px] text-brand-muted">
+              {individualCount} 件单独售 · {bundleOnlyCount} 件仅在套装内
+            </span>
+          )}
         </div>
+
+        {items.length === 0 && (
+          <p className="text-[12px] text-brand-muted leading-relaxed border border-dashed border-brand-line rounded-2xl px-4 py-3 bg-brand-cream">
+            可以不加单件物品直接发布，整屋总图 + 描述就够了。
+            如果想让某件单独可买/能被买家点开看图 — 下面加单件。
+          </p>
+        )}
 
         <div className="space-y-3">
           {items.map((it, idx) => (
@@ -182,24 +197,32 @@ export function MovingSalePublishForm({
                 <span className="text-[12px] font-mono text-brand-muted">
                   Item #{String(idx + 1).padStart(2, '0')}
                 </span>
-                {items.length > 1 && (
-                  <button
-                    type="button"
-                    onClick={() => removeItem(it.k)}
-                    className="text-[11px] text-brand-danger hover:underline"
-                  >
-                    移除
-                  </button>
-                )}
+                <button
+                  type="button"
+                  onClick={() => removeItem(it.k)}
+                  className="text-[11px] text-brand-danger hover:underline"
+                >
+                  移除
+                </button>
               </div>
-              <Input
-                label="物品名"
-                value={it.title}
-                onChange={(e) => updateItem(it.k, { title: e.target.value })}
-                placeholder="例：北欧三人沙发"
-                maxLength={60}
-                required
-              />
+
+              <div className="flex gap-3">
+                <ItemImagePicker
+                  imagePath={it.imagePath}
+                  onChange={(p) => updateItem(it.k, { imagePath: p })}
+                />
+                <div className="flex-1 min-w-0">
+                  <Input
+                    label="物品名"
+                    value={it.title}
+                    onChange={(e) => updateItem(it.k, { title: e.target.value })}
+                    placeholder="例：北欧三人沙发"
+                    maxLength={60}
+                    required
+                  />
+                </div>
+              </div>
+
               <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                 <Select
                   label="分类"
@@ -241,7 +264,7 @@ export function MovingSalePublishForm({
           onClick={addItem}
           className="w-full border-2 border-dashed border-brand-line rounded-2xl py-3 text-[13px] text-brand-muted hover:border-brand-yellow hover:text-brand-ink transition-colors"
         >
-          + 添加物品
+          + 添加单件物品
         </button>
       </section>
 
@@ -257,8 +280,86 @@ export function MovingSalePublishForm({
       )}
 
       <Button type="submit" size="lg" loading={loading} className="w-full">
-        发布搬家甩卖（共 {items.length} 件）
+        {items.length > 0
+          ? `发布搬家甩卖（含 ${items.length} 件）`
+          : '发布搬家甩卖（整屋一图）'}
       </Button>
     </form>
+  )
+}
+
+/** 单件小封面 — 64×64 方框，点上传，上传成功后显示缩略图 */
+function ItemImagePicker({
+  imagePath,
+  onChange,
+}: {
+  imagePath: string
+  onChange: (path: string) => void
+}) {
+  const inputRef = useRef<HTMLInputElement>(null)
+  const [uploading, setUploading] = useState(false)
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
+
+  async function onPick(e: React.ChangeEvent<HTMLInputElement>) {
+    const file = e.target.files?.[0]
+    if (!file) return
+    const supabase = createClient()
+    const {
+      data: { user },
+    } = await supabase.auth.getUser()
+    if (!user) return
+    setUploading(true)
+    try {
+      const blob = await compressImage(file)
+      const filename = `${user.id}/${crypto.randomUUID()}.webp`
+      const { error } = await supabase.storage
+        .from('listings')
+        .upload(filename, blob, { contentType: 'image/webp', upsert: false })
+      if (!error) onChange(filename)
+    } catch (e) {
+      console.error('item upload failed', e)
+    }
+    setUploading(false)
+    if (inputRef.current) inputRef.current.value = ''
+  }
+
+  return (
+    <div className="shrink-0">
+      <input
+        ref={inputRef}
+        type="file"
+        accept="image/*"
+        className="hidden"
+        onChange={onPick}
+      />
+      {imagePath ? (
+        <div className="relative w-16 h-16 rounded-xl overflow-hidden bg-brand-cream border border-brand-line">
+          <Image
+            src={`${supabaseUrl}/storage/v1/object/public/listings/${imagePath}`}
+            alt=""
+            fill
+            className="object-cover"
+            sizes="64px"
+          />
+          <button
+            type="button"
+            onClick={() => onChange('')}
+            className="absolute top-0 right-0 w-5 h-5 bg-black/60 text-white text-[11px] rounded-bl-md"
+            aria-label="移除"
+          >
+            ×
+          </button>
+        </div>
+      ) : (
+        <button
+          type="button"
+          disabled={uploading}
+          onClick={() => inputRef.current?.click()}
+          className="w-16 h-16 rounded-xl border-2 border-dashed border-brand-line text-brand-muted hover:border-brand-yellow hover:text-brand-ink text-[10px] flex flex-col items-center justify-center gap-0.5"
+        >
+          {uploading ? <span>…</span> : <><span className="text-base leading-none">+</span><span>图</span></>}
+        </button>
+      )}
+    </div>
   )
 }

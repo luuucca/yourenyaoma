@@ -34,11 +34,14 @@ export default async function NewJobPage() {
     )
   }
 
-  // 当前已发布数（用于前端展示限额）
-  const { data: countRes } = await supabase.rpc('active_jobs_count', {
-    p_user_id: user.id,
-  })
+  // 当前已发布数 + 用户资料里的联系方式（用于自动填充）
+  const [{ data: countRes }, { data: profile }] = await Promise.all([
+    supabase.rpc('active_jobs_count', { p_user_id: user.id }),
+    supabase.from('profiles').select('wechat, whatsapp').eq('id', user.id).single(),
+  ])
   const activeCount = typeof countRes === 'number' ? countRes : 0
+  const myWechat = (profile?.wechat as string | null) ?? null
+  const myWhatsapp = (profile?.whatsapp as string | null) ?? null
 
   return (
     <article className="max-w-2xl mx-auto px-4 md:px-6 py-8 md:py-12">
@@ -58,7 +61,7 @@ export default async function NewJobPage() {
         告诉社区你在招什么人。维也纳华人邻居会看到。
       </p>
 
-      <JobPublishForm activeCount={activeCount} />
+      <JobPublishForm activeCount={activeCount} myWechat={myWechat} myWhatsapp={myWhatsapp} />
     </article>
   )
 }

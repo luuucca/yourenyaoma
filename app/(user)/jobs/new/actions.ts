@@ -4,38 +4,21 @@ import { z } from 'zod'
 import { revalidatePath } from 'next/cache'
 import { createClient } from '@/lib/supabase/server'
 
-const jobSchema = z
-  .object({
-    title: z.string().trim().min(4, '标题至少 4 字').max(80, '标题不超过 80 字'),
-    description: z
-      .string()
-      .trim()
-      .min(10, '描述至少 10 字')
-      .max(2000, '描述不超过 2000 字'),
-    region: z.string().trim().min(2, '请填写工作地点').max(80),
-    salary_text: z
-      .string()
-      .trim()
-      .max(60, '薪资字段过长')
-      .optional()
-      .or(z.literal('')),
-    contact_wechat: z.string().trim().max(40).optional().or(z.literal('')),
-    contact_whatsapp: z.string().trim().max(40).optional().or(z.literal('')),
-    contact_email: z
-      .string()
-      .trim()
-      .max(80)
-      .optional()
-      .or(z.literal(''))
-      .refine((v) => !v || /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(v), {
-        message: '邮箱格式不对',
-      }),
-  })
-  .refine(
-    (v) =>
-      !!(v.contact_wechat || v.contact_whatsapp || v.contact_email),
-    { message: '至少填一个联系方式（微信/WhatsApp/邮箱）', path: ['contact_wechat'] },
-  )
+const jobSchema = z.object({
+  title: z.string().trim().min(4, '标题至少 4 字').max(80, '标题不超过 80 字'),
+  description: z
+    .string()
+    .trim()
+    .min(10, '描述至少 10 字')
+    .max(2000, '描述不超过 2000 字'),
+  region: z.string().trim().min(2, '请填写工作地点').max(80),
+  salary_text: z
+    .string()
+    .trim()
+    .max(60, '薪资字段过长')
+    .optional()
+    .or(z.literal('')),
+})
 
 export type JobInput = z.infer<typeof jobSchema>
 
@@ -61,14 +44,19 @@ export async function publishJob(input: JobInput): Promise<Result> {
     return { error: '你已有 2 条招工广告，先关闭一条再发新的' }
   }
 
-  // 检查 ban
+  // 检查 ban + 联系方式必须存在
   const { data: profile } = await supabase
     .from('profiles')
-    .select('role')
+    .select('role, wechat, whatsapp')
     .eq('id', user.id)
     .single()
   if (profile?.role === 'banned') return { error: '账号已被封禁' }
+  if (!profile?.wechat && !profile?.whatsapp) {
+    return { error: '请先去「我的 → 编辑资料」补充微信或 WhatsApp 后再发布' }
+  }
 
+  // 联系方式不再单独存 jobs 表 — 读时 JOIN profile
+  // (DB 列保留向后兼容，统一存 null)
   const { data: job, error } = await supabase
     .from('jobs')
     .insert({
@@ -77,9 +65,9 @@ export async function publishJob(input: JobInput): Promise<Result> {
       description: parsed.data.description,
       region: parsed.data.region,
       salary_text: parsed.data.salary_text || null,
-      contact_wechat: parsed.data.contact_wechat || null,
-      contact_whatsapp: parsed.data.contact_whatsapp || null,
-      contact_email: parsed.data.contact_email || null,
+      contact_wechat: null,
+      contact_whatsapp: null,
+      contact_email: null,
       status: 'published',
     })
     .select('id')

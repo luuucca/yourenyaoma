@@ -19,6 +19,8 @@ const itemSchema = z.object({
   condition: z.enum(validConditionIds as [string, ...string[]]),
   /** 单一售价已填 → 出现在 /browse；为空 → 仅 bundle 内可见 */
   bundle_only: z.boolean(),
+  /** 单件可选封面（Supabase Storage path） */
+  image_path: z.string().optional().or(z.literal('')),
 })
 
 const movingSaleSchema = z.object({
@@ -38,7 +40,8 @@ const movingSaleSchema = z.object({
     pickup_available: z.boolean(),
     image_paths: z.array(z.string()).min(1, '请至少上传 1 张总封面图'),
   }),
-  items: z.array(itemSchema).min(1, '至少添加 1 件物品').max(50, '最多 50 件'),
+  // items 改为可选 — 可以只发父 bundle 一张总图描述整屋
+  items: z.array(itemSchema).max(50, '最多 50 件').default([]),
 })
 
 export type MovingSaleInput = z.infer<typeof movingSaleSchema>
@@ -99,27 +102,47 @@ export async function publishMovingSale(input: MovingSaleInput): Promise<Result>
     await supabase.from('listing_images').insert(parentImageRows)
   }
 
-  // 3) 子 listings 批量插入
-  const childRows = items.map((it) => ({
-    user_id: user.id,
-    title: it.title,
-    description: it.description || '',
-    price: it.price ?? 0,
-    category: it.category,
-    condition: it.condition,
-    district: parent.district, // 继承父区域
-    pickup_available: parent.pickup_available,
-    status: 'published',
-    published_at: new Date().toISOString(),
-    parent_listing_id: parentRow.id,
-    bundle_only: it.bundle_only,
-  }))
-  const { error: childErr } = await supabase.from('listings').insert(childRows)
-  if (childErr) {
-    // 父已经创建 → 不回滚（用户可以编辑/删除）
-    return {
-      parentId: parentRow.id,
-      error: `子物品部分失败: ${childErr.message}`,
+  // 3) 子 listings — 可能 0 件（用户只想发整屋总图）
+  if (items.length > 0) {
+    const childRows = items.map((it) => ({
+      user_id: user.id,
+      title: it.title,
+      description: it.description || '',
+      price: it.price ?? 0,
+      category: it.category,
+      condition: it.condition,
+      district: parent.district,
+      pickup_available: parent.pickup_available,
+      status: 'published',
+      published_at: new Date().toISOString(),
+      parent_listing_id: parentRow.id,
+      bundle_only: it.bundle_only,
+    }))
+    const { data: insertedChildren, error: childErr } = await supabase
+      .from('listings')
+      .insert(childRows)
+      .select('id')
+    if (childErr || !insertedChildren) {
+      return {
+        parentId: parentRow.id,
+        error: `子物品部分失败: ${childErr?.message ?? '未知'}`,
+      }
+    }
+
+    // 4) 每件子物品如果有照片，挂到 listing_images
+    const childImageRows = insertedChildren
+      .map((child, idx) => {
+        const item = items[idx]
+        if (!item.image_path) return null
+        return {
+          listing_id: child.id,
+          image_url: `${supabaseUrl}/storage/v1/object/public/listings/${item.image_path}`,
+          sort_order: 0,
+        }
+      })
+      .filter(Boolean) as any[]
+    if (childImageRows.length > 0) {
+      await supabase.from('listing_images').insert(childImageRows)
     }
   }
 
