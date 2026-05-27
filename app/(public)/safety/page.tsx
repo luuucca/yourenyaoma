@@ -166,6 +166,10 @@ export default function SafetyPage() {
   )
 }
 
+/**
+ * 编辑风双栏对照 — 把同一个场景的 do / don't 分别拆到左右两列。
+ * 不用绿红 pill，整体克制；颜色对比只在 ✓/✗ 前缀字符上。
+ */
 function ScenarioBlock({
   eyebrow,
   title,
@@ -175,25 +179,74 @@ function ScenarioBlock({
   title: string
   tips: { do: string; dont: string }[]
 }) {
+  // 把原始数据里前缀的 ✓ / ✗ 抹掉 — 渲染时用独立的 prefix 节点
+  const strip = (s: string) => s.replace(/^[✓✗]\s*/, '').trim()
+
   return (
-    <section className="mb-10">
+    <section className="mb-14">
       <div className="font-mono text-[11px] tracking-[0.18em] uppercase text-brand-muted mb-2">
         — {eyebrow}
       </div>
-      <h2 className="font-serif text-[26px] md:text-[32px] font-bold text-brand-ink m-0 mb-5 leading-[1.1]">
+      <h2 className="font-serif text-[26px] md:text-[32px] font-bold text-brand-ink m-0 mb-7 leading-[1.1]">
         {title}
       </h2>
-      <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-        {tips.map((t, i) => (
-          <div key={i} className="grid grid-cols-1 gap-1">
-            <div className="rounded-xl px-4 py-2.5 bg-emerald-50 border border-emerald-200 text-[13px] text-emerald-900 leading-relaxed">
-              {t.do}
-            </div>
-            <div className="rounded-xl px-4 py-2.5 bg-red-50 border border-red-200 text-[13px] text-red-900 leading-relaxed">
-              {t.dont}
-            </div>
+
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-x-12 gap-y-8">
+        {/* 左：这么做 (DO) */}
+        <div>
+          <div className="flex items-baseline gap-3 pb-3 border-b-2 border-brand-ink mb-4">
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-brand-muted">
+              do
+            </span>
+            <span className="font-serif text-[16px] font-semibold text-brand-ink">
+              这么做
+            </span>
           </div>
-        ))}
+          <ul className="space-y-3.5 m-0 p-0 list-none">
+            {tips.map((t, i) => (
+              <li
+                key={`do-${i}`}
+                className="flex items-baseline gap-3 text-[14px] text-brand-ink-soft leading-[1.55]"
+              >
+                <span
+                  className="font-bold text-brand-yellow shrink-0 text-[15px] leading-none"
+                  aria-hidden
+                >
+                  ✓
+                </span>
+                <span>{strip(t.do)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
+
+        {/* 右：绝对不要 (DON'T) */}
+        <div>
+          <div className="flex items-baseline gap-3 pb-3 border-b border-brand-line-2 mb-4">
+            <span className="font-mono text-[10px] uppercase tracking-[0.2em] text-brand-muted">
+              don&apos;t
+            </span>
+            <span className="font-serif text-[16px] font-semibold text-brand-ink-soft">
+              绝对不要
+            </span>
+          </div>
+          <ul className="space-y-3.5 m-0 p-0 list-none">
+            {tips.map((t, i) => (
+              <li
+                key={`dont-${i}`}
+                className="flex items-baseline gap-3 text-[14px] text-brand-muted leading-[1.55]"
+              >
+                <span
+                  className="font-mono text-brand-ink-soft shrink-0 text-[14px] leading-none"
+                  aria-hidden
+                >
+                  ×
+                </span>
+                <span>{strip(t.dont)}</span>
+              </li>
+            ))}
+          </ul>
+        </div>
       </div>
     </section>
   )
