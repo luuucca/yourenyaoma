@@ -6,7 +6,7 @@ const COLUMNS: { label: string; links: { href: string; label: string }[] }[] = [
     label: '产品',
     links: [
       { href: '/publish', label: '发布闲置' },
-      { href: '/browse?cat=moving', label: '搬家甩卖' },
+      { href: '/moving', label: '搬家甩卖' },
       { href: '/pros', label: '找师傅' },
       { href: '/buddies', label: '找搭子' },
       { href: '/jobs', label: '找工作' },

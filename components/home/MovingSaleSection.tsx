@@ -51,8 +51,8 @@ export default async function MovingSaleSection() {
           eyebrow="— MOVING · 整屋打包"
           title="搬家甩卖专区"
           desc="回国 / 搬家 / 毕业 — 整屋好物一次拎走 · 可包圆可单买"
-          moreHref="/publish/moving"
-          moreLabel="发布搬家甩卖 →"
+          moreHref="/moving"
+          moreLabel="查看全部 →"
           tint="yellow"
         />
         <div className="grid grid-cols-1 md:grid-cols-3 gap-5">
@@ -60,9 +60,7 @@ export default async function MovingSaleSection() {
             // demo data 用 m.id (number) / m.title / m.desc / m.price / m.region / m.items
             // real data 用 m.id (uuid) / m.title / m.description / m.price / m.district / childCount
             const isDemo = useDemo
-            const href = isDemo
-              ? `/browse?cat=moving&pack=${m.id}`
-              : `/listing/${m.id}`
+            const href = isDemo ? `/moving` : `/listing/${m.id}`
             const cover = isDemo
               ? null
               : [...(m.listing_images ?? [])].sort(

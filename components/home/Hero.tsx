@@ -94,15 +94,24 @@ export default function Hero() {
 
         <div className="mt-9 font-mono text-[11px] text-brand-muted tracking-[0.18em] uppercase">— popular</div>
         <div className="flex flex-wrap gap-2 mt-3">
-          {HOT_SEARCHES.map((q) => (
-            <Link
-              key={q}
-              href={`/browse?q=${encodeURIComponent(q)}`}
-              className="text-[12px] py-1.5 px-3.5 border border-brand-line-3 rounded-pill text-brand-ink-soft hover:border-brand-ink hover:text-brand-ink transition-colors"
-            >
-              {q}
-            </Link>
-          ))}
+          {HOT_SEARCHES.map((q) => {
+            // 几个热搜词跳专属页而非 /browse 搜索
+            const href =
+              q === '搬家甩卖'
+                ? '/moving'
+                : q === '找工作'
+                  ? '/jobs'
+                  : `/browse?q=${encodeURIComponent(q)}`
+            return (
+              <Link
+                key={q}
+                href={href}
+                className="text-[12px] py-1.5 px-3.5 border border-brand-line-3 rounded-pill text-brand-ink-soft hover:border-brand-ink hover:text-brand-ink transition-colors"
+              >
+                {q}
+              </Link>
+            )
+          })}
         </div>
       </div>
 

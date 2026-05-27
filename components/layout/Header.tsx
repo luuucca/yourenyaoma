@@ -84,7 +84,7 @@ export default async function Header() {
                         </li>
                         <li>
                           <Link
-                            href="/browse?cat=moving"
+                            href="/moving"
                             className="block px-4 py-2 text-[13px] hover:bg-brand-cream transition-colors"
                           >
                             搬家甩卖
