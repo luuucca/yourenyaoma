@@ -41,8 +41,8 @@ export function AiSuggestionCard({
 
   if (loading) {
     return (
-      <div className="border border-brand-line-2 rounded-2xl px-4 py-3.5 bg-brand-yellow-soft flex items-center gap-3">
-        <SparkleIcon className="w-4 h-4 animate-pulse text-brand-ink shrink-0" />
+      <div className="border border-brand-line-2 rounded-2xl px-4 py-3.5 bg-brand-yellow-soft flex items-center gap-3 animate-card-rise">
+        <SparkleIcon className="w-4 h-4 animate-sparkle-breathe text-brand-ink shrink-0" />
         <span className="text-[13px] text-brand-ink-soft">
           AI 看图中…几秒后给你标题、分类、估价建议
         </span>
@@ -60,7 +60,7 @@ export function AiSuggestionCard({
     currentPrice === String(suggestion.estimated_price_eur)
 
   return (
-    <div className="border border-brand-line-2 rounded-2xl bg-brand-yellow-soft px-4 py-4 space-y-3">
+    <div className="border border-brand-line-2 rounded-2xl bg-brand-yellow-soft px-4 py-4 space-y-3 animate-card-rise">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-2">
           <SparkleIcon className="w-4 h-4 text-brand-ink" />

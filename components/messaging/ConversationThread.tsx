@@ -30,6 +30,10 @@ export function ConversationThread({
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
+  // 初始历史不动画，仅之后到达的（自己发的 + Realtime 推回的）走入场
+  const initialIdsRef = useRef<Set<string>>(
+    new Set(initialMessages.map((m) => m.id)),
+  )
 
   // Realtime 订阅 — 新消息插入时实时推到本地
   useEffect(() => {
@@ -105,8 +109,9 @@ export function ConversationThread({
             const prev = messages[i - 1]
             const showTime =
               !prev || new Date(m.created_at).getTime() - new Date(prev.created_at).getTime() > 5 * 60 * 1000
+            const isNew = !initialIdsRef.current.has(m.id)
             return (
-              <div key={m.id}>
+              <div key={m.id} className={isNew ? 'animate-message-rise' : ''}>
                 {showTime && (
                   <div className="text-center text-[10px] font-mono text-brand-muted-soft my-2">
                     {formatStamp(m.created_at)}

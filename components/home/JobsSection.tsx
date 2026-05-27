@@ -61,7 +61,7 @@ export default async function JobsSection() {
             <li key={j.id}>
               <Link
                 href={`/jobs/${j.id}`}
-                className="block border border-brand-line rounded-2xl p-5 bg-white hover:border-brand-ink transition-colors h-full"
+                className="block border border-brand-line rounded-2xl p-5 bg-white hover:border-brand-ink hover:-translate-y-0.5 hover:shadow-[0_8px_18px_-12px_rgba(0,0,0,0.15)] transition-all duration-200 ease-out motion-reduce:transition-none h-full"
               >
                 <h3 className="font-serif font-bold text-[16px] text-brand-ink m-0 mb-1.5 truncate">
                   {j.title}

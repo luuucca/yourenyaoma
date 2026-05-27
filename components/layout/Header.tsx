@@ -69,7 +69,10 @@ export default async function Header() {
                       </svg>
                     </Link>
                     {/* 不可见 padding 当桥，避免鼠标从触发器移到菜单时关闭 */}
-                    <div className="absolute top-full left-0 hidden group-hover:block group-focus-within:block pt-2 z-50">
+                    {/* 透明度 + Y 位移过渡，比 display 硬切自然得多 */}
+                    <div
+                      className="absolute top-full left-0 pt-2 z-50 opacity-0 invisible -translate-y-1 pointer-events-none group-hover:opacity-100 group-hover:visible group-hover:translate-y-0 group-hover:pointer-events-auto group-focus-within:opacity-100 group-focus-within:visible group-focus-within:translate-y-0 group-focus-within:pointer-events-auto transition-[opacity,transform] duration-200 ease-out motion-reduce:transition-none"
+                    >
                       <ul className="bg-white border border-brand-line rounded-2xl shadow-[0_8px_24px_-8px_rgba(0,0,0,0.12)] py-1.5 min-w-[160px]">
                         <li>
                           <Link

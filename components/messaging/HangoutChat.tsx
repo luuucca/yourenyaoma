@@ -40,6 +40,10 @@ export function HangoutChat({
   const [draft, setDraft] = useState('')
   const [sending, setSending] = useState(false)
   const endRef = useRef<HTMLDivElement>(null)
+  // 仅 mount 之后到达的消息走入场动画 — 初始历史 SSR 后直接显示，不蹦
+  const initialIdsRef = useRef<Set<string>>(
+    new Set(initialMessages.map((m) => m.id)),
+  )
 
   // Realtime 订阅
   useEffect(() => {
@@ -128,9 +132,10 @@ export function HangoutChat({
                 (isMine ? '你' : '邻居')
               const showSenderHeader =
                 !prev || prev.sender_id !== m.sender_id || showStamp
+              const isNew = !initialIdsRef.current.has(m.id)
 
               return (
-                <div key={m.id}>
+                <div key={m.id} className={isNew ? 'animate-message-rise' : ''}>
                   {showStamp && (
                     <div className="text-center text-[10px] font-mono text-brand-muted-soft my-2">
                       {formatStamp(m.created_at)}

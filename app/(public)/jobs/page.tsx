@@ -62,7 +62,7 @@ export default async function JobsPage() {
             <li key={j.id}>
               <Link
                 href={`/jobs/${j.id}`}
-                className="block border border-brand-line rounded-2xl p-5 bg-white hover:border-brand-ink transition-colors"
+                className="block border border-brand-line rounded-2xl p-5 bg-white hover:border-brand-ink hover:-translate-y-0.5 hover:shadow-[0_8px_18px_-12px_rgba(0,0,0,0.15)] transition-all duration-200 ease-out motion-reduce:transition-none"
               >
                 <div className="flex items-baseline justify-between gap-3 mb-1.5">
                   <h2 className="font-serif font-bold text-[18px] text-brand-ink m-0 truncate">
