@@ -36,7 +36,11 @@ export async function updateHangoutDescription(
 export async function sendHangoutMessage(input: {
   hangoutId: string
   body: string
-}): Promise<Result> {
+}): Promise<{
+  ok?: true
+  error?: string
+  message?: { id: string; sender_id: string; body: string; created_at: string }
+}> {
   const trimmed = input.body.trim()
   if (!trimmed) return { error: '不能发空消息' }
   if (trimmed.length > 2000) return { error: '消息太长（最多 2000 字）' }
@@ -47,18 +51,20 @@ export async function sendHangoutMessage(input: {
   } = await supabase.auth.getUser()
   if (!user) return { error: '请先登录' }
 
-  const { error } = await supabase.from('hangout_messages').insert({
-    hangout_id: input.hangoutId,
-    sender_id: user.id,
-    body: trimmed,
-  })
+  const { data, error } = await supabase
+    .from('hangout_messages')
+    .insert({
+      hangout_id: input.hangoutId,
+      sender_id: user.id,
+      body: trimmed,
+    })
+    .select('id, sender_id, body, created_at')
+    .single()
 
   if (error) {
-    // RLS deny / 其它错
     return { error: `发送失败: ${error.message}` }
   }
-  revalidatePath(`/buddies/${input.hangoutId}`)
-  return { ok: true }
+  return { ok: true, message: data }
 }
 
 // Host-only: cancel their hangout (sets status to 'cancelled').

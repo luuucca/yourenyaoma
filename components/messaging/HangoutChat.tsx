@@ -86,7 +86,14 @@ export function HangoutChat({
       return
     }
     setDraft('')
-    router.refresh()
+    // 乐观把刚插入的消息追到本地 state — 立即看见自己发的内容。
+    // Realtime 兜底（如果也推回来同一条，ID 去重不会重复显示）。
+    if (result.message) {
+      setMessages((prev) => {
+        if (prev.some((x) => x.id === result.message!.id)) return prev
+        return [...prev, result.message!]
+      })
+    }
   }
 
   return (

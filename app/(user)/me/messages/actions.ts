@@ -51,7 +51,17 @@ export async function createOrFindConversation(input: {
 export async function sendMessage(input: {
   conversationId: string
   body: string
-}): Promise<{ ok?: true; error?: string }> {
+}): Promise<{
+  ok?: true
+  error?: string
+  message?: {
+    id: string
+    sender_id: string
+    body: string
+    read_at: string | null
+    created_at: string
+  }
+}> {
   const trimmed = input.body.trim()
   if (!trimmed) return { error: '不能发空消息' }
   if (trimmed.length > 2000) return { error: '消息太长（最多 2000 字）' }
@@ -62,18 +72,22 @@ export async function sendMessage(input: {
   } = await supabase.auth.getUser()
   if (!user) return { error: '请先登录' }
 
-  const { error } = await supabase.from('messages').insert({
-    conversation_id: input.conversationId,
-    sender_id: user.id,
-    body: trimmed,
-  })
+  const { data, error } = await supabase
+    .from('messages')
+    .insert({
+      conversation_id: input.conversationId,
+      sender_id: user.id,
+      body: trimmed,
+    })
+    .select('id, sender_id, body, read_at, created_at')
+    .single()
 
   if (error) {
     return { error: `发送失败: ${error.message}` }
   }
   revalidatePath('/me/messages')
   revalidatePath(`/me/messages/${input.conversationId}`)
-  return { ok: true }
+  return { ok: true, message: data }
 }
 
 export async function markConversationRead(conversationId: string): Promise<void> {

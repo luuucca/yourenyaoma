@@ -81,8 +81,13 @@ export function ConversationThread({
       return
     }
     setDraft('')
-    // 实际消息会通过 Realtime 推回；不用本地 optimistic
-    router.refresh()
+    // 乐观追加到本地 state；Realtime 兜底，ID 去重防止重复
+    if (result.message) {
+      setMessages((prev) => {
+        if (prev.some((x) => x.id === result.message!.id)) return prev
+        return [...prev, result.message!]
+      })
+    }
   }
 
   return (
