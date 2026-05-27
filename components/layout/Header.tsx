@@ -39,20 +39,82 @@ export default async function Header() {
             <span className="w-2 h-2 rounded-sm bg-brand-yellow inline-block brand-breath motion-reduce:animate-none" aria-hidden />
           </Link>
           <nav aria-label="主导航" className="hidden md:flex gap-9 text-[14px] text-[#444] ml-6">
-            {NAV_ITEMS.map((item) => (
-              <Link
-                key={item.href}
-                href={item.href}
-                aria-current={item.href === '/' ? 'page' : undefined}
-                className={
-                  item.href === '/'
-                    ? 'text-brand-ink font-semibold inline-flex items-center min-h-[44px] py-0.5 transition-colors'
-                    : 'inline-flex items-center min-h-[44px] py-0.5 hover:text-brand-ink transition-colors'
-                }
-              >
-                {item.label}
-              </Link>
-            ))}
+            {NAV_ITEMS.map((item) => {
+              if (item.href === '/browse') {
+                // 「分类」hover 下拉：全部闲置 / 搬家甩卖 / 免费送
+                return (
+                  <div
+                    key={item.href}
+                    className="relative inline-flex items-center min-h-[44px] py-0.5 group"
+                  >
+                    <Link
+                      href="/browse"
+                      aria-haspopup="menu"
+                      className="hover:text-brand-ink transition-colors inline-flex items-center gap-1"
+                    >
+                      {item.label}
+                      <svg
+                        viewBox="0 0 12 12"
+                        width="10"
+                        height="10"
+                        fill="none"
+                        stroke="currentColor"
+                        strokeWidth="1.5"
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        aria-hidden
+                        className="transition-transform group-hover:rotate-180"
+                      >
+                        <path d="M3 4.5 L6 7.5 L9 4.5" />
+                      </svg>
+                    </Link>
+                    {/* 不可见 padding 当桥，避免鼠标从触发器移到菜单时关闭 */}
+                    <div className="absolute top-full left-0 hidden group-hover:block group-focus-within:block pt-2 z-50">
+                      <ul className="bg-white border border-brand-line rounded-2xl shadow-[0_8px_24px_-8px_rgba(0,0,0,0.12)] py-1.5 min-w-[160px]">
+                        <li>
+                          <Link
+                            href="/browse"
+                            className="block px-4 py-2 text-[13px] hover:bg-brand-cream transition-colors"
+                          >
+                            全部闲置
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href="/browse?cat=moving"
+                            className="block px-4 py-2 text-[13px] hover:bg-brand-cream transition-colors"
+                          >
+                            搬家甩卖
+                          </Link>
+                        </li>
+                        <li>
+                          <Link
+                            href="/free"
+                            className="block px-4 py-2 text-[13px] hover:bg-brand-cream transition-colors"
+                          >
+                            免费送
+                          </Link>
+                        </li>
+                      </ul>
+                    </div>
+                  </div>
+                )
+              }
+              return (
+                <Link
+                  key={item.href}
+                  href={item.href}
+                  aria-current={item.href === '/' ? 'page' : undefined}
+                  className={
+                    item.href === '/'
+                      ? 'text-brand-ink font-semibold inline-flex items-center min-h-[44px] py-0.5 transition-colors'
+                      : 'inline-flex items-center min-h-[44px] py-0.5 hover:text-brand-ink transition-colors'
+                  }
+                >
+                  {item.label}
+                </Link>
+              )
+            })}
           </nav>
           <div className="ml-auto flex items-center gap-5 md:gap-[22px] text-[13px] text-[#444]">
             {user ? (
