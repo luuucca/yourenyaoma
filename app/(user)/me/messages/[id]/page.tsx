@@ -36,7 +36,7 @@ export default async function ConversationPage({
   const [listingRes, profileRes, messagesRes] = await Promise.all([
     supabase
       .from('listings')
-      .select('id, title, price, cover_image_path, status')
+      .select('id, title, price, status, listing_images(image_url, sort_order)')
       .eq('id', conv.listing_id)
       .maybeSingle(),
     supabase
@@ -56,15 +56,15 @@ export default async function ConversationPage({
     id: string
     title: string
     price: number | null
-    cover_image_path: string | null
     status: string
+    listing_images?: { image_url: string; sort_order: number }[]
   } | null
   const messages = messagesRes.data
 
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const cover = listing?.cover_image_path
-    ? `${supabaseUrl}/storage/v1/object/public/listings/${listing.cover_image_path}`
-    : null
+  const cover =
+    [...(listing?.listing_images ?? [])].sort(
+      (a, b) => a.sort_order - b.sort_order,
+    )[0]?.image_url ?? null
 
   const isBuyer = conv.buyer_id === user.id
   const counterParty = profileRes.data?.nickname || (isBuyer ? '卖家' : '买家')

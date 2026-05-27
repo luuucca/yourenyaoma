@@ -52,7 +52,7 @@ export default async function MessagesInboxPage() {
     listingIds.length > 0
       ? supabase
           .from('listings')
-          .select('id, title, price, cover_image_path, status')
+          .select('id, title, price, status, listing_images(image_url, sort_order)')
           .in('id', listingIds)
       : Promise.resolve({ data: [] as any[] }),
     counterPartyIds.length > 0
@@ -76,7 +76,14 @@ export default async function MessagesInboxPage() {
   ])
 
   const listingMap = new Map<string, any>()
-  ;(listingsRes.data || []).forEach((l: any) => listingMap.set(l.id, l))
+  ;(listingsRes.data || []).forEach((l: any) => {
+    // 取 sort_order 最小的当封面
+    const cover_image_url =
+      [...(l.listing_images ?? [])].sort(
+        (a: any, b: any) => a.sort_order - b.sort_order,
+      )[0]?.image_url ?? null
+    listingMap.set(l.id, { ...l, cover_image_url })
+  })
   const profileMap = new Map<string, any>()
   ;(profilesRes.data || []).forEach((p: any) => profileMap.set(p.id, p))
   const lastByConv = new Map<string, any>()
@@ -90,8 +97,6 @@ export default async function MessagesInboxPage() {
       (unreadByConv.get(m.conversation_id) || 0) + 1,
     )
   })
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
 
   return (
     <div className="container-page py-6 max-w-2xl">
@@ -120,9 +125,7 @@ export default async function MessagesInboxPage() {
             const lastMsg = lastByConv.get(c.id)
             const unread = unreadByConv.get(c.id) || 0
             const listing = listingMap.get(c.listing_id)
-            const cover = listing?.cover_image_path
-              ? `${supabaseUrl}/storage/v1/object/public/listings/${listing.cover_image_path}`
-              : null
+            const cover = listing?.cover_image_url ?? null
 
             return (
               <li key={c.id}>
