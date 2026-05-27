@@ -3,11 +3,11 @@ import Link from 'next/link'
 import { usePathname } from 'next/navigation'
 import { cn } from '@/lib/utils/cn'
 
-// Compact mobile bottom nav. Six items so 找搭子 + 找师傅 are first-class
-// (not buried in a side menu). 「发布」 is the visual anchor in the middle —
-// black filled circle with yellow plus, slightly raised above the rail.
+// Compact mobile bottom nav. 7 items — odd count so 「发布」 sits truly center,
+// 3 items on each side. 「发布」 is the visual anchor: black filled circle with
+// yellow plus, raised above the rail.
 //
-// Icons are inline lucide-style line SVGs (1.6px stroke) — no emoji, no
+// Icons are inline lucide-style line SVGs (1.7px stroke) — no emoji, no
 // raster icon library. Stays on brand and crisp on hi-dpi.
 type Item = {
   href: string
@@ -23,6 +23,7 @@ const items: Item[] = [
   { href: '/buddies', label: '搭子', icon: <IconUsers /> },
   { href: '/publish', label: '发布', icon: <IconPlus />, primary: true },
   { href: '/pros', label: '师傅', icon: <IconWrench /> },
+  { href: '/jobs', label: '工作', icon: <IconBriefcase /> },
   { href: '/me', label: '我的', icon: <IconUser /> },
 ]
 
@@ -33,7 +34,7 @@ export default function MobileNav() {
       aria-label="底部导航"
       className="md:hidden fixed bottom-0 inset-x-0 z-40 bg-white/95 backdrop-blur border-t border-brand-line pb-[max(env(safe-area-inset-bottom,0px),0px)]"
     >
-      <div className="grid grid-cols-6">
+      <div className="grid grid-cols-7">
         {items.map((it) => {
           const active =
             pathname === it.href || (it.href !== '/' && pathname.startsWith(it.href))
@@ -151,6 +152,16 @@ function IconUser() {
     <Svg>
       <circle cx="12" cy="8.5" r="3.5" />
       <path d="M4 20c.8-3.8 4.2-6 8-6s7.2 2.2 8 6" />
+    </Svg>
+  )
+}
+
+function IconBriefcase() {
+  return (
+    <Svg>
+      <rect x="3" y="8" width="18" height="12" rx="2" />
+      <path d="M9 8V6a2 2 0 0 1 2-2h2a2 2 0 0 1 2 2v2" />
+      <path d="M3 13h18" />
     </Svg>
   )
 }
