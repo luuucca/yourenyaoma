@@ -1,12 +1,14 @@
 import Link from 'next/link'
 import SplitText from '@/components/SplitText'
 import Magnet from '@/components/Magnet'
+import HeroVideoCycler from '@/components/home/HeroVideoCycler'
 
 const HOT_SEARCHES = ['IKEA 沙发', '搬家甩卖', '自行车', 'MacBook', '中文书', '免费送']
 
 export default function Hero() {
   return (
-    <section className="max-w-[1360px] mx-auto px-4 md:px-16 pt-12 md:pt-[72px] pb-8">
+    <section className="max-w-[1360px] mx-auto px-4 md:px-16 pt-12 md:pt-[72px] pb-8 grid md:grid-cols-[1.1fr_0.9fr] gap-10 md:gap-14 items-center">
+      {/* LEFT */}
       <div>
         <div className="font-mono text-[12px] tracking-[0.18em] text-brand-muted uppercase mb-7 font-medium">
           OVERSEAS · 海外华人邻里社区
@@ -104,6 +106,8 @@ export default function Hero() {
         </div>
       </div>
 
+      {/* RIGHT — 视频循环播放器，按顺序播完一个切下一个 */}
+      <HeroVideoCycler />
     </section>
   )
 }

@@ -3,6 +3,7 @@ import Link from 'next/link'
 import { createClient } from '@/lib/supabase/server'
 import { ListingGallery } from '@/components/listing/ListingGallery'
 import { ContactReveal } from '@/components/listing/ContactReveal'
+import { MessageSellerButton } from '@/components/listing/MessageSellerButton'
 import { FavoriteButton } from '@/components/listing/FavoriteButton'
 import { ReportDialog } from '@/components/listing/ReportDialog'
 import ShareButton from '@/components/listing/ShareButton'
@@ -217,12 +218,20 @@ export default async function ListingDetailPage({
             )}
           </div>
         </div>
-        <ContactReveal
-          listingId={listing.id}
-          loggedIn={!!user}
-          sellerId={listing.user_id}
-          viewerId={user?.id ?? null}
-        />
+        <div className="mt-4 space-y-2">
+          <MessageSellerButton
+            listingId={listing.id}
+            sellerId={listing.user_id}
+            loggedIn={!!user}
+            viewerId={user?.id ?? null}
+          />
+          <ContactReveal
+            listingId={listing.id}
+            loggedIn={!!user}
+            sellerId={listing.user_id}
+            viewerId={user?.id ?? null}
+          />
+        </div>
       </section>
 
       {/* 5. Safety reminder — always last */}

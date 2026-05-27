@@ -42,3 +42,6 @@ restore-youren-yaoma.ps1
 # Design handoff bundle — 26MB of PNG references from Claude Design export.
 # Useful as a visual source-of-truth but heavy.
 _design_handoff/
+.screenshot-*.png
+.scroll-hero-*.png
+.claude/

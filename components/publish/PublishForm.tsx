@@ -6,6 +6,7 @@ import { Select } from '@/components/ui/Select'
 import { Button } from '@/components/ui/Button'
 import { useToast } from '@/components/ui/Toast'
 import { ImageUploader } from './ImageUploader'
+import { AiSuggestionCard, type AiSuggestion } from './AiSuggestionCard'
 import { CATEGORIES } from '@/lib/constants/categories'
 import { CONDITIONS } from '@/lib/constants/conditions'
 import { DISTRICTS } from '@/lib/constants/districts'
@@ -25,6 +26,44 @@ export function PublishForm({ defaultDistrict }: { defaultDistrict?: string | nu
   const [imagePaths, setImagePaths] = useState<string[]>([])
   const [errors, setErrors] = useState<Record<string, string>>({})
   const [loading, setLoading] = useState(false)
+  const [aiLoading, setAiLoading] = useState(false)
+  const [aiSuggestion, setAiSuggestion] = useState<AiSuggestion | null>(null)
+
+  /** 用户成功上传第 1 张图后，调 Gemini API 拿建议 */
+  async function handleFirstImageUploaded(path: string) {
+    setAiLoading(true)
+    setAiSuggestion(null)
+    try {
+      const res = await fetch('/api/ai/analyze-listing', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ imagePath: path }),
+      })
+      if (!res.ok) {
+        // 静默降级：服务不可用 / 没 key / 限流时不打扰用户
+        setAiLoading(false)
+        return
+      }
+      const data = (await res.json()) as AiSuggestion
+      setAiSuggestion(data)
+    } catch {
+      // 网络挂了也静默
+    }
+    setAiLoading(false)
+  }
+
+  function applyAllSuggestions() {
+    if (!aiSuggestion) return
+    if (aiSuggestion.title && !title) setTitle(aiSuggestion.title)
+    if (aiSuggestion.category && !category) setCategory(aiSuggestion.category)
+    if (
+      aiSuggestion.estimated_price_eur !== null &&
+      aiSuggestion.estimated_price_eur !== undefined &&
+      !price
+    ) {
+      setPrice(String(aiSuggestion.estimated_price_eur))
+    }
+  }
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault()
@@ -67,7 +106,24 @@ export function PublishForm({ defaultDistrict }: { defaultDistrict?: string | nu
 
   return (
     <form onSubmit={onSubmit} className="space-y-5">
-      <ImageUploader paths={imagePaths} onChange={setImagePaths} error={errors.image_paths} />
+      <ImageUploader
+        paths={imagePaths}
+        onChange={setImagePaths}
+        error={errors.image_paths}
+        onFirstImageUploaded={handleFirstImageUploaded}
+      />
+      <AiSuggestionCard
+        loading={aiLoading}
+        suggestion={aiSuggestion}
+        currentTitle={title}
+        currentCategory={category}
+        currentPrice={price}
+        onApplyTitle={setTitle}
+        onApplyCategory={setCategory}
+        onApplyPrice={setPrice}
+        onApplyAll={applyAllSuggestions}
+        onDismiss={() => setAiSuggestion(null)}
+      />
       <Input
         label="标题"
         value={title}

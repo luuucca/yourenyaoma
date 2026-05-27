@@ -11,10 +11,13 @@ export function ImageUploader({
   paths,
   onChange,
   error,
+  onFirstImageUploaded,
 }: {
   paths: string[]
   onChange: (paths: string[]) => void
   error?: string
+  /** 用户成功上传第一张图后触发（用于触发 AI 识别建议） */
+  onFirstImageUploaded?: (path: string) => void
 }) {
   const { show } = useToast()
   const inputRef = useRef<HTMLInputElement>(null)
@@ -57,6 +60,10 @@ export function ImageUploader({
     setUploading(false)
     onChange([...paths, ...newPaths])
     if (inputRef.current) inputRef.current.value = ''
+    // 第一张图上传完毕 → 触发 AI 识别（如果调用方注册了 handler）
+    if (paths.length === 0 && newPaths.length > 0 && onFirstImageUploaded) {
+      onFirstImageUploaded(newPaths[0])
+    }
   }
 
   function remove(idx: number) {

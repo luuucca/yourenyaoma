@@ -19,6 +19,13 @@ export default async function Header() {
     data: { user },
   } = await supabase.auth.getUser()
 
+  // 拉未读消息数（用于「我的」右上小红点）。失败时静默为 0，不阻塞渲染。
+  let unread = 0
+  if (user) {
+    const { data } = await supabase.rpc('unread_count_total')
+    unread = typeof data === 'number' ? data : 0
+  }
+
   return (
     <>
       <AnnouncementMarquee />
@@ -50,8 +57,19 @@ export default async function Header() {
           </nav>
           <div className="ml-auto flex items-center gap-5 md:gap-[22px] text-[13px] text-[#444]">
             {user ? (
-              <Link href="/me" className="hidden sm:inline hover:text-brand-ink transition-colors">
+              <Link
+                href="/me"
+                className="hidden sm:inline-flex items-center gap-1.5 hover:text-brand-ink transition-colors relative"
+              >
                 我的
+                {unread > 0 && (
+                  <span
+                    className="bg-brand-danger text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1"
+                    aria-label={`${unread} 条未读消息`}
+                  >
+                    {unread > 99 ? '99+' : unread}
+                  </span>
+                )}
               </Link>
             ) : (
               <Link href="/login" className="hidden sm:inline hover:text-brand-ink transition-colors">

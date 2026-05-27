@@ -28,6 +28,7 @@ export default async function MePage() {
     { count: hostingCount },
     { count: joinedCount },
     { count: offerCount },
+    unreadResult,
   ] = await Promise.all([
     supabase
       .from('listings')
@@ -52,7 +53,10 @@ export default async function MePage() {
       .select('id', { count: 'exact', head: true })
       .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`)
       .eq('status', 'pending'),
+    // 站内信未读数
+    supabase.rpc('unread_count_total'),
   ])
+  const unreadMessages = typeof unreadResult.data === 'number' ? unreadResult.data : 0
 
   return (
     <div className="container-page py-6 max-w-2xl">
@@ -113,7 +117,7 @@ export default async function MePage() {
         <Link
           href="/me/offers"
           className={
-            'card p-4 flex flex-col items-center justify-center hover:shadow-lg transition col-span-2 ' +
+            'card p-4 flex flex-col items-center justify-center hover:shadow-lg transition ' +
             ((offerCount ?? 0) > 0 ? 'border-2 border-brand-yellow' : '')
           }
         >
@@ -122,6 +126,24 @@ export default async function MePage() {
           <span className="text-xs text-brand-muted">
             {(offerCount ?? 0) > 0 ? `${offerCount} 条等回应` : '暂无未读'}
           </span>
+        </Link>
+        <Link
+          href="/me/messages"
+          className={
+            'card p-4 flex flex-col items-center justify-center hover:shadow-lg transition relative ' +
+            (unreadMessages > 0 ? 'border-2 border-brand-danger' : '')
+          }
+        >
+          <span className="text-2xl mb-1">💬</span>
+          <span className="font-medium">站内信</span>
+          <span className="text-xs text-brand-muted">
+            {unreadMessages > 0 ? `${unreadMessages} 条未读` : '暂无未读'}
+          </span>
+          {unreadMessages > 0 && (
+            <span className="absolute top-2 right-2 bg-brand-danger text-white text-[10px] font-bold rounded-full min-w-[18px] h-[18px] flex items-center justify-center px-1">
+              {unreadMessages > 99 ? '99+' : unreadMessages}
+            </span>
+          )}
         </Link>
       </div>
 
