@@ -32,7 +32,7 @@ const mono = JetBrains_Mono({
 const siteName = '有人要吗'
 const siteTitle = '有人要吗 — 海外华人邻里社区'
 const siteDescription =
-  '你不要的，正好有人要。海外华人邻里社区 — 一个平台解决三件事：闲置二手、靠谱师傅、同城搭子。'
+  '你不要的，正好有人要。海外华人邻里社区 — 一个平台解决四件事：闲置二手、找师傅、找搭子、找工作。'
 const siteUrl = process.env.NEXT_PUBLIC_SITE_URL || 'http://localhost:3000'
 
 export const metadata: Metadata = {

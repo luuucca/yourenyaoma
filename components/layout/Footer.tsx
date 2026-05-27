@@ -6,9 +6,10 @@ const COLUMNS: { label: string; links: { href: string; label: string }[] }[] = [
     label: '产品',
     links: [
       { href: '/publish', label: '发布闲置' },
+      { href: '/browse?cat=moving', label: '搬家甩卖' },
       { href: '/pros', label: '找师傅' },
       { href: '/buddies', label: '找搭子' },
-      { href: '/browse?cat=moving', label: '搬家甩卖' },
+      { href: '/jobs', label: '找工作' },
       { href: '/free', label: '免费送' },
     ],
   },
@@ -48,7 +49,7 @@ export default function Footer() {
             <span className="w-2 h-2 rounded-sm bg-brand-yellow -translate-y-0.5 inline-block" aria-hidden />
           </div>
           <p className="text-brand-muted leading-relaxed mt-4 text-[13px] max-w-[260px]">
-            面向海外华人的同城邻里社区。一个平台解决三件事——闲置二手、靠谱师傅、同城搭子。让漂泊的日子也有邻里温度。
+            面向海外华人的同城邻里社区。一个平台解决四件事——闲置二手、找师傅、找搭子、找工作。让漂泊的日子也有邻里温度。
           </p>
         </div>
         {COLUMNS.map((col) => (

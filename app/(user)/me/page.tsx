@@ -145,6 +145,14 @@ export default async function MePage() {
             </span>
           )}
         </Link>
+        <Link
+          href="/me/jobs"
+          className="card p-4 flex flex-col items-center justify-center hover:shadow-lg transition col-span-2"
+        >
+          <span className="text-2xl mb-1">💼</span>
+          <span className="font-medium">我的招工</span>
+          <span className="text-xs text-brand-muted">发布/管理招工广告（限 2 条）</span>
+        </Link>
       </div>
 
       {profile?.role === 'admin' && (

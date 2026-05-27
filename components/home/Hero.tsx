@@ -3,7 +3,7 @@ import SplitText from '@/components/SplitText'
 import Magnet from '@/components/Magnet'
 import HeroVideoCycler from '@/components/home/HeroVideoCycler'
 
-const HOT_SEARCHES = ['IKEA 沙发', '搬家甩卖', '自行车', 'MacBook', '中文书', '免费送']
+const HOT_SEARCHES = ['IKEA 沙发', '搬家甩卖', '自行车', 'MacBook', '中文书', '找工作']
 
 export default function Hero() {
   return (

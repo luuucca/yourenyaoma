@@ -6,11 +6,10 @@ import ShinyPublishCTA from './ShinyPublishCTA'
 const NAV_ITEMS = [
   { href: '/', label: '首页' },
   { href: '/browse', label: '分类' },
-  { href: '/free', label: '免费送' },
   { href: '/pros', label: '找师傅' },
   { href: '/buddies', label: '找搭子' },
+  { href: '/jobs', label: '找工作' },
   { href: '/safety', label: '安全交易' },
-  { href: '/about', label: '关于我们' },
 ] as const
 
 export default async function Header() {

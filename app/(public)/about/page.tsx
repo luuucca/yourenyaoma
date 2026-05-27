@@ -3,7 +3,7 @@ import Link from 'next/link'
 export const metadata = {
   title: '关于我们',
   description:
-    '面向海外华人的同城邻里社区。一个平台解决三件事 — 闲置二手、靠谱师傅、同城搭子。让漂泊的日子也有邻里温度。',
+    '面向海外华人的同城邻里社区。一个平台解决四件事 — 闲置二手、找师傅、找搭子、找工作。让漂泊的日子也有邻里温度。',
 }
 
 export default function AboutPage() {
@@ -21,10 +21,11 @@ export default function AboutPage() {
           </span>
         </h1>
         <p className="mt-6 text-[16px] text-brand-ink-soft leading-relaxed max-w-[560px]">
-          漂泊的日子也要有邻居。一个平台解决三件事 —
+          漂泊的日子也要有邻居。一个平台解决四件事 —
           <strong className="text-brand-ink">闲置二手</strong>、
-          <strong className="text-brand-ink">靠谱师傅</strong>、
-          <strong className="text-brand-ink">同城搭子</strong>。
+          <strong className="text-brand-ink">找师傅</strong>、
+          <strong className="text-brand-ink">找搭子</strong>、
+          <strong className="text-brand-ink">找工作</strong>。
         </p>
       </div>
 
@@ -39,12 +40,12 @@ export default function AboutPage() {
           想买想卖想约的事，直接在这里发，邻居们自然就来了。
         </Block>
 
-        <Block eyebrow="HOW" title="三件事 · 一个原则">
+        <Block eyebrow="HOW" title="四件事 · 一个原则">
           <ul className="m-0 list-none p-0 space-y-3 text-[14px] md:text-[15px] text-brand-ink-soft leading-relaxed">
             <li>
               <strong className="text-brand-ink">闲置二手</strong> ——
-              发布 / 浏览 / 砍价 / 同城自取。第一版不抽佣、不站内支付，
-              纯信息发布 + 双方自己谈。
+              发布 / 浏览 / 砍价 / 同城自取。包含搬家甩卖整批清空。
+              第一版不抽佣、不站内支付，纯信息发布 + 双方自己谈。
             </li>
             <li>
               <strong className="text-brand-ink">找师傅</strong> ——
@@ -54,7 +55,12 @@ export default function AboutPage() {
             <li>
               <strong className="text-brand-ink">找搭子</strong> ——
               饭搭子、球友、游戏车队、徒步、拼车、演唱会。
-              一次性 / 每周定期 / 长期有效都行。
+              一次性 / 每周定期 / 长期有效都行。加入活动自动进入群聊。
+            </li>
+            <li>
+              <strong className="text-brand-ink">找工作</strong> ——
+              本地华人招工广告。餐厅、保洁、保姆、家教、办公室工作等。
+              每个用户同时最多 2 条招工广告。
             </li>
           </ul>
           <p className="mt-5 mb-0 text-[14px] md:text-[15px] text-brand-ink-soft leading-relaxed">
