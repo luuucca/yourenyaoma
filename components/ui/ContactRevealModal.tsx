@@ -1,5 +1,5 @@
 'use client'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, type ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 
 type Contact = {
@@ -17,6 +17,8 @@ type Props = {
   contact: Contact | null
   loading?: boolean
   error?: string | null
+  /** 覆盖默认脚注。可以传字符串或 JSX。 */
+  footerNote?: ReactNode
 }
 
 // Generic modal used by Pro "聊一聊", Hangout "我要加入" success, and Free "Take it"
@@ -30,6 +32,7 @@ export default function ContactRevealModal({
   contact,
   loading,
   error,
+  footerNote,
 }: Props) {
   const [mounted, setMounted] = useState(false)
   useEffect(() => setMounted(true), [])
@@ -112,9 +115,11 @@ export default function ContactRevealModal({
                 这位邻居还没填联系方式，等他们补完后再试。
               </div>
             )}
-            <p className="text-[11px] text-brand-muted pt-3 border-t border-brand-line leading-relaxed">
-              提示：站内 IM 即将上线。在此之前请通过上面方式联系，并优先在公共场所交付。
-            </p>
+            <div className="text-[11px] text-brand-muted pt-3 border-t border-brand-line leading-relaxed">
+              {footerNote ?? (
+                <span>提示：优先公共场所交付。不要提前转账、不要点击陌生支付链接。</span>
+              )}
+            </div>
           </div>
         )}
       </div>

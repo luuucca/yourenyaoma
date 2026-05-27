@@ -108,10 +108,33 @@ export default function HangoutJoinButton({
         open={open}
         onClose={() => setOpen(false)}
         title={`已加入：${hangoutTitle}`}
-        subtitle="复制发起人联系方式约一下时间和地点。公共场所见面更安心。"
+        subtitle="群聊已开通，下面页面里就能看到。需要直接联系发起人时再用下面方式。"
         loading={loading}
         error={error}
         contact={contact}
+        footerNote={
+          <button
+            type="button"
+            onClick={() => {
+              setOpen(false)
+              // 滚到群聊面板 — 找 h3 "群聊" 节点
+              if (typeof window !== 'undefined') {
+                requestAnimationFrame(() => {
+                  const headings = Array.from(
+                    document.querySelectorAll('h3'),
+                  ) as HTMLElement[]
+                  const chat = headings.find((h) =>
+                    h.textContent?.includes('群聊'),
+                  )
+                  chat?.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                })
+              }
+            }}
+            className="w-full bg-brand-ink text-white rounded-pill py-2.5 text-[13px] font-medium hover:opacity-85 active:translate-y-px transition-all"
+          >
+            进入群聊 ↓
+          </button>
+        }
       />
     </>
   )
