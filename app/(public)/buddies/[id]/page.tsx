@@ -5,6 +5,7 @@ import HangoutJoinButton from '@/components/home/HangoutJoinButton'
 import HostAgendaEditor from '@/components/publish/HostAgendaEditor'
 import HostCancelButton from '@/components/publish/HostCancelButton'
 import HangoutCover from '@/components/listing/HangoutCover'
+import { HangoutChat } from '@/components/messaging/HangoutChat'
 import { pickHangoutCover } from '@/lib/utils/hangoutCover'
 
 export const dynamic = 'force-dynamic'
@@ -52,7 +53,31 @@ export default async function HangoutDetailPage({ params }: { params: { id: stri
   const isHost = user?.id === hangout.host_id
   const alreadyJoined =
     !!user && !!participants?.find((p: any) => p.user_id === user.id)
+  const isMember = isHost || alreadyJoined
   const hostProfile: any = (hangout as any).profiles
+
+  // 仅成员加载群聊历史消息 + 拼成员昵称映射
+  let initialChatMessages: any[] = []
+  const participantMap: Record<string, string> = {}
+  if (isMember) {
+    // 拉群聊历史
+    const { data: msgs } = await supabase
+      .from('hangout_messages')
+      .select('id, sender_id, body, created_at')
+      .eq('hangout_id', params.id)
+      .order('created_at', { ascending: true })
+    initialChatMessages = msgs || []
+
+    // 成员名映射：host + 已加入参与者
+    if (hostProfile?.nickname) {
+      participantMap[hangout.host_id] = hostProfile.nickname
+    }
+    ;(participants || []).forEach((p: any) => {
+      if (p.profiles?.nickname) {
+        participantMap[p.user_id] = p.profiles.nickname
+      }
+    })
+  }
   const remaining = Math.max(0, hangout.total_spots - hangout.taken_spots)
   const spotsLabel =
     hangout.status === 'full' || remaining === 0
@@ -166,13 +191,24 @@ export default async function HangoutDetailPage({ params }: { params: { id: stri
         </section>
       )}
 
+      {/* 群聊 — 仅成员（host 或 已加入）可见 */}
+      {isMember && (
+        <HangoutChat
+          hangoutId={hangout.id}
+          viewerId={user!.id}
+          hostId={hangout.host_id}
+          initialMessages={initialChatMessages}
+          participantMap={participantMap}
+        />
+      )}
+
       {/* Safety reminder */}
       <section className="mt-12 p-5 rounded-2xl bg-brand-cream border border-brand-line">
         <h3 className="font-serif text-[15px] font-bold text-brand-ink mb-2">安全提醒</h3>
         <ul className="text-[13px] text-brand-ink-soft leading-relaxed space-y-1 list-none p-0">
           <li>· 公共场所见面，避开夜间偏僻地点</li>
-          <li>· 财物 AA 事先约清楚，活动中保留聊天记录</li>
-          <li>· 站内 IM 即将上线 · 在此之前微信/WhatsApp 沟通</li>
+          <li>· 财物 AA 事先约清楚，群聊记录平台留存</li>
+          <li>· 加入活动后自动进入群聊；退出后无法继续读消息</li>
         </ul>
       </section>
     </article>
