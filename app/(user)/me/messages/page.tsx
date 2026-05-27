@@ -14,17 +14,6 @@ type Conversation = {
   buyer_id: string
   seller_id: string
   last_message_at: string
-  // Joined data
-  listings: {
-    id: string
-    title: string
-    price: number | null
-    cover_image_path: string | null
-    status: string
-  } | null
-  // Counter-party profile
-  buyer_profile: { nickname: string | null } | null
-  seller_profile: { nickname: string | null } | null
 }
 
 export default async function MessagesInboxPage() {
@@ -34,23 +23,10 @@ export default async function MessagesInboxPage() {
   } = await supabase.auth.getUser()
   if (!user) redirect('/login?next=/me/messages')
 
-  // 拉用户所有 conversations，按最新消息时间倒序
+  // 1) 拉用户所有 conversations（纯字段，避免 embed FK 歧义）
   const { data: conversations, error } = await supabase
     .from('conversations')
-    .select(
-      `
-      id,
-      listing_id,
-      buyer_id,
-      seller_id,
-      last_message_at,
-      listings!conversations_listing_id_fkey (
-        id, title, price, cover_image_path, status
-      ),
-      buyer_profile:profiles!conversations_buyer_id_fkey ( nickname ),
-      seller_profile:profiles!conversations_seller_id_fkey ( nickname )
-    `,
-    )
+    .select('id, listing_id, buyer_id, seller_id, last_message_at')
     .or(`buyer_id.eq.${user.id},seller_id.eq.${user.id}`)
     .order('last_message_at', { ascending: false })
     .returns<Conversation[]>()
@@ -64,16 +40,31 @@ export default async function MessagesInboxPage() {
     )
   }
 
-  // 拉每个对话的最新消息 + 该对话内当前用户的未读数
-  const convIds = (conversations || []).map((c) => c.id)
-  const [lastMessagesRes, unreadRes] = await Promise.all([
+  // 2) 单独 batch 查 listings + profiles + 最新消息 + 未读，再前端拼
+  const convList = conversations || []
+  const convIds = convList.map((c) => c.id)
+  const listingIds = convList.map((c) => c.listing_id)
+  const counterPartyIds = Array.from(
+    new Set(convList.map((c) => (c.buyer_id === user.id ? c.seller_id : c.buyer_id))),
+  )
+
+  const [listingsRes, profilesRes, lastMessagesRes, unreadRes] = await Promise.all([
+    listingIds.length > 0
+      ? supabase
+          .from('listings')
+          .select('id, title, price, cover_image_path, status')
+          .in('id', listingIds)
+      : Promise.resolve({ data: [] as any[] }),
+    counterPartyIds.length > 0
+      ? supabase.from('profiles').select('id, nickname').in('id', counterPartyIds)
+      : Promise.resolve({ data: [] as any[] }),
     convIds.length > 0
       ? supabase
           .from('messages')
           .select('id, conversation_id, sender_id, body, created_at')
           .in('conversation_id', convIds)
           .order('created_at', { ascending: false })
-      : Promise.resolve({ data: [] }),
+      : Promise.resolve({ data: [] as any[] }),
     convIds.length > 0
       ? supabase
           .from('messages')
@@ -81,9 +72,13 @@ export default async function MessagesInboxPage() {
           .in('conversation_id', convIds)
           .is('read_at', null)
           .neq('sender_id', user.id)
-      : Promise.resolve({ data: [] }),
+      : Promise.resolve({ data: [] as any[] }),
   ])
 
+  const listingMap = new Map<string, any>()
+  ;(listingsRes.data || []).forEach((l: any) => listingMap.set(l.id, l))
+  const profileMap = new Map<string, any>()
+  ;(profilesRes.data || []).forEach((p: any) => profileMap.set(p.id, p))
   const lastByConv = new Map<string, any>()
   ;(lastMessagesRes.data || []).forEach((m: any) => {
     if (!lastByConv.has(m.conversation_id)) lastByConv.set(m.conversation_id, m)
@@ -110,7 +105,7 @@ export default async function MessagesInboxPage() {
         </Link>
       </div>
 
-      {!conversations || conversations.length === 0 ? (
+      {convList.length === 0 ? (
         <div className="text-center py-16 text-brand-muted text-sm">
           还没有对话。
           <br />
@@ -118,14 +113,13 @@ export default async function MessagesInboxPage() {
         </div>
       ) : (
         <ul className="border border-brand-line rounded-2xl overflow-hidden divide-y divide-brand-line bg-white">
-          {conversations.map((c) => {
+          {convList.map((c) => {
             const isBuyer = c.buyer_id === user.id
-            const counterParty = isBuyer
-              ? c.seller_profile?.nickname
-              : c.buyer_profile?.nickname
+            const counterPartyId = isBuyer ? c.seller_id : c.buyer_id
+            const counterParty = profileMap.get(counterPartyId)?.nickname
             const lastMsg = lastByConv.get(c.id)
             const unread = unreadByConv.get(c.id) || 0
-            const listing = c.listings
+            const listing = listingMap.get(c.listing_id)
             const cover = listing?.cover_image_path
               ? `${supabaseUrl}/storage/v1/object/public/listings/${listing.cover_image_path}`
               : null

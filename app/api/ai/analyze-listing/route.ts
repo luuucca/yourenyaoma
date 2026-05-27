@@ -83,8 +83,9 @@ export async function POST(req: NextRequest) {
 
   try {
     const ai = new GoogleGenerativeAI(apiKey)
+    // gemini-1.5-flash 已下线 → 用 2.5 系列。最新最强且仍在免费额度内
     const model = ai.getGenerativeModel({
-      model: 'gemini-1.5-flash',
+      model: 'gemini-2.5-flash',
       generationConfig: { responseMimeType: 'application/json' },
     })
 

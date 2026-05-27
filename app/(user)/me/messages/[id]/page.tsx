@@ -21,50 +21,53 @@ export default async function ConversationPage({
   } = await supabase.auth.getUser()
   if (!user) redirect(`/login?next=/me/messages/${params.id}`)
 
+  // 1) 拉基础 conversation 字段（不 embed，避免 FK 歧义）
   const { data: conv } = await supabase
     .from('conversations')
-    .select(
-      `
-      id, listing_id, buyer_id, seller_id, created_at,
-      listings!conversations_listing_id_fkey (
-        id, title, price, cover_image_path, status
-      ),
-      buyer_profile:profiles!conversations_buyer_id_fkey ( nickname ),
-      seller_profile:profiles!conversations_seller_id_fkey ( nickname )
-    `,
-    )
+    .select('id, listing_id, buyer_id, seller_id, created_at')
     .eq('id', params.id)
     .maybeSingle()
 
   if (!conv) notFound()
   if (conv.buyer_id !== user.id && conv.seller_id !== user.id) notFound()
 
-  // 标记已读
-  await markConversationRead(params.id)
+  // 2) 并行查 listing + 对方 profile + 历史消息 + 标记已读
+  const counterPartyId = conv.buyer_id === user.id ? conv.seller_id : conv.buyer_id
+  const [listingRes, profileRes, messagesRes] = await Promise.all([
+    supabase
+      .from('listings')
+      .select('id, title, price, cover_image_path, status')
+      .eq('id', conv.listing_id)
+      .maybeSingle(),
+    supabase
+      .from('profiles')
+      .select('nickname')
+      .eq('id', counterPartyId)
+      .maybeSingle(),
+    supabase
+      .from('messages')
+      .select('id, sender_id, body, read_at, created_at')
+      .eq('conversation_id', params.id)
+      .order('created_at', { ascending: true }),
+    markConversationRead(params.id),
+  ])
 
-  // 拉历史消息（按时间正序）
-  const { data: messages } = await supabase
-    .from('messages')
-    .select('id, sender_id, body, read_at, created_at')
-    .eq('conversation_id', params.id)
-    .order('created_at', { ascending: true })
-
-  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
-  const listing = (conv as any).listings as {
+  const listing = listingRes.data as {
     id: string
     title: string
     price: number | null
     cover_image_path: string | null
     status: string
   } | null
+  const messages = messagesRes.data
+
+  const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL!
   const cover = listing?.cover_image_path
     ? `${supabaseUrl}/storage/v1/object/public/listings/${listing.cover_image_path}`
     : null
 
   const isBuyer = conv.buyer_id === user.id
-  const counterParty = isBuyer
-    ? (conv as any).seller_profile?.nickname || '卖家'
-    : (conv as any).buyer_profile?.nickname || '买家'
+  const counterParty = profileRes.data?.nickname || (isBuyer ? '卖家' : '买家')
 
   return (
     <div className="container-page py-4 max-w-2xl">
