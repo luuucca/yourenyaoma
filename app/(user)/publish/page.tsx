@@ -43,6 +43,25 @@ export default async function PublishPage() {
       <p className="text-sm text-brand-muted mb-6">
         填写商品信息，让你的闲置找到下一位主人
       </p>
+
+      {/* 搬家甩卖入口 —— 整屋批量发布走另一个页面 */}
+      <a
+        href="/publish/moving"
+        className="block mb-7 border border-brand-line rounded-2xl p-4 bg-brand-warm hover:border-brand-ink transition-colors"
+      >
+        <div className="flex items-center justify-between gap-3">
+          <div className="min-w-0">
+            <div className="text-[14px] font-medium text-brand-ink">
+              📦 整屋甩卖？走这个
+            </div>
+            <div className="text-[12px] text-brand-muted mt-0.5 leading-snug">
+              一次发布很多物品 · 可设包圆总价 / 单件价 · 标了价的也会出现在普通分类
+            </div>
+          </div>
+          <span className="text-brand-muted shrink-0">→</span>
+        </div>
+      </a>
+
       <PublishForm defaultDistrict={profile?.district ?? null} />
     </div>
   )

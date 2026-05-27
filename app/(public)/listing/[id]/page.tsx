@@ -58,6 +58,26 @@ export default async function ListingDetailPage({
     await supabase.rpc('increment_view_count', { p_listing_id: params.id })
   }
 
+  // 搬家甩卖：拉父 listing 标题（如果有）+ 子物品列表（如果是父）
+  let parentBundle: { id: string; title: string } | null = null
+  if ((listing as any).parent_listing_id) {
+    const { data: p } = await supabase
+      .from('listings')
+      .select('id, title')
+      .eq('id', (listing as any).parent_listing_id)
+      .maybeSingle()
+    if (p) parentBundle = p as any
+  }
+  const { data: bundleChildren } = await supabase
+    .from('listings')
+    .select(
+      'id, title, price, category, condition, bundle_only, listing_images(image_url, sort_order)',
+    )
+    .eq('parent_listing_id', listing.id)
+    .eq('status', 'published')
+    .order('created_at', { ascending: true })
+  const isBundleParent = (bundleChildren || []).length > 0
+
   const images = ((listing as any).listing_images ?? [])
     .slice()
     .sort((a: any, b: any) => a.sort_order - b.sort_order)
@@ -194,11 +214,85 @@ export default async function ListingDetailPage({
 
       {/* 3. Description */}
       <section className="card p-5 md:col-start-1 md:row-start-3">
+        {parentBundle && (
+          <Link
+            href={`/listing/${parentBundle.id}`}
+            className="block mb-4 text-[12px] font-mono py-2 px-3 rounded-pill bg-brand-warm border border-brand-line text-brand-ink-soft hover:border-brand-ink hover:text-brand-ink transition-colors w-fit"
+          >
+            📦 属于「{parentBundle.title}」搬家甩卖
+          </Link>
+        )}
         <h2 className="font-semibold mb-2">商品描述</h2>
         <p className="whitespace-pre-wrap text-sm leading-relaxed">
           {listing.description}
         </p>
       </section>
+
+      {/* 3.5 搬家甩卖物品清单 — 只在 listing 本身是 bundle 父时显示 */}
+      {isBundleParent && (
+        <section className="card p-5 md:col-start-1 md:col-span-2 md:row-start-4">
+          <div className="flex items-baseline justify-between mb-4">
+            <h2 className="font-semibold">📦 包含物品（{bundleChildren!.length} 件）</h2>
+            <span className="text-[11px] font-mono text-brand-muted tracking-wider">
+              {bundleChildren!.filter((c: any) => !c.bundle_only).length} 件可单买
+            </span>
+          </div>
+          <ul className="grid grid-cols-2 md:grid-cols-3 gap-3">
+            {bundleChildren!.map((c: any) => {
+              const cover =
+                [...(c.listing_images ?? [])].sort(
+                  (a: any, b: any) => a.sort_order - b.sort_order,
+                )[0]?.image_url ?? null
+              const standalone = !c.bundle_only
+              const inner = (
+                <>
+                  <div className="aspect-square bg-brand-cream rounded-lg overflow-hidden relative">
+                    {cover ? (
+                      // eslint-disable-next-line @next/next/no-img-element
+                      <img
+                        src={cover}
+                        alt={c.title}
+                        className="absolute inset-0 w-full h-full object-cover"
+                      />
+                    ) : (
+                      <div className="absolute inset-0 flex items-center justify-center text-brand-muted-soft text-2xl">
+                        ✦
+                      </div>
+                    )}
+                    {!standalone && (
+                      <span className="absolute top-1.5 left-1.5 bg-brand-ink/85 text-white text-[9px] font-mono py-0.5 px-1.5 rounded-pill tracking-wider">
+                        套装内
+                      </span>
+                    )}
+                  </div>
+                  <div className="mt-2">
+                    <div className="text-[13px] font-medium text-brand-ink truncate">
+                      {c.title}
+                    </div>
+                    <div className="text-[12px] font-mono text-brand-ink-soft mt-0.5">
+                      {Number(c.price) > 0 ? `€${Number(c.price)}` : '随套装'}
+                    </div>
+                  </div>
+                </>
+              )
+              return (
+                <li key={c.id}>
+                  {standalone ? (
+                    <Link
+                      href={`/listing/${c.id}`}
+                      className="block hover:opacity-85 transition-opacity"
+                    >
+                      {inner}
+                    </Link>
+                  ) : (
+                    <div className="cursor-default">{inner}</div>
+                  )}
+                </li>
+              )
+            })}
+          </ul>
+        </section>
+      )}
 
       {/* (offer chain now lives inside the title/price card above) */}
 
@@ -234,8 +328,13 @@ export default async function ListingDetailPage({
         </div>
       </section>
 
-      {/* 5. Safety reminder — always last */}
-      <section className="card p-5 bg-brand-yellow-soft/30 border border-brand-yellow text-sm md:col-start-1 md:col-span-2 md:row-start-4">
+      {/* 5. Safety reminder — always last (row 5 if bundle parent took row 4) */}
+      <section
+        className={
+          'card p-5 bg-brand-yellow-soft/30 border border-brand-yellow text-sm md:col-start-1 md:col-span-2 ' +
+          (isBundleParent ? 'md:row-start-5' : 'md:row-start-4')
+        }
+      >
         <div className="font-semibold mb-2">⚠️ 安全交易提醒</div>
         <ul className="space-y-1 text-brand-ink-soft">
           <li>· 建议本地当面交易</li>

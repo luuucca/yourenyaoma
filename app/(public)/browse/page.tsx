@@ -32,6 +32,8 @@ export default async function BrowsePage({
       { count: 'exact' },
     )
     .eq('status', 'published')
+    // 搬家甩卖 bundle-only 子物品不在 browse 出现（仅在父详情里看得到）
+    .eq('bundle_only', false)
 
   if (searchParams.q) {
     const q = searchParams.q.replace(/[%_]/g, '')
