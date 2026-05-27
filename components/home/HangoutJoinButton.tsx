@@ -117,17 +117,19 @@ export default function HangoutJoinButton({
             type="button"
             onClick={() => {
               setOpen(false)
-              // 滚到群聊面板 — 找 h3 "群聊" 节点
+              // router.refresh() 是异步的，群聊面板还没渲到 DOM；轮询找最多 3 秒
               if (typeof window !== 'undefined') {
-                requestAnimationFrame(() => {
-                  const headings = Array.from(
-                    document.querySelectorAll('h3'),
-                  ) as HTMLElement[]
-                  const chat = headings.find((h) =>
-                    h.textContent?.includes('群聊'),
-                  )
-                  chat?.scrollIntoView({ behavior: 'smooth', block: 'start' })
-                })
+                let tries = 0
+                const tick = () => {
+                  const el = document.getElementById('hangout-chat-section')
+                  if (el) {
+                    el.scrollIntoView({ behavior: 'smooth', block: 'start' })
+                    return
+                  }
+                  tries++
+                  if (tries < 30) setTimeout(tick, 100)
+                }
+                tick()
               }
             }}
             className="w-full bg-brand-ink text-white rounded-pill py-2.5 text-[13px] font-medium hover:opacity-85 active:translate-y-px transition-all"

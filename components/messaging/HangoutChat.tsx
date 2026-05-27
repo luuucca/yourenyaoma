@@ -97,7 +97,7 @@ export function HangoutChat({
   }
 
   return (
-    <section className="mt-10">
+    <section id="hangout-chat-section" className="mt-10 scroll-mt-20">
       <div className="flex items-baseline justify-between mb-3">
         <h3 className="font-serif text-[18px] font-bold text-brand-ink">群聊</h3>
         <span className="text-[11px] font-mono text-brand-muted tracking-[0.05em]">
