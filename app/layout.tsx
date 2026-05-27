@@ -64,10 +64,24 @@ export const metadata: Metadata = {
     images: ['/og.png'],
   },
   icons: {
-    icon: [
-      { url: '/favicon.svg', type: 'image/svg+xml' },
-    ],
-    apple: '/apple-touch-icon.png',
+    // SVG for modern browsers (auto-resize)
+    icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
+    // iOS / iPadOS home-screen icon — Next.js auto-generates from
+    // app/apple-icon.tsx, but we override here explicitly for clarity
+    apple: [{ url: '/apple-icon', sizes: '180x180' }],
+  },
+  // PWA: 让 iOS Safari 把站点当 standalone app
+  appleWebApp: {
+    capable: true,
+    title: '有人要吗',
+    statusBarStyle: 'default',
+  },
+  // 多个 OS / 兼容旧设备的 meta
+  other: {
+    'mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-capable': 'yes',
+    'apple-mobile-web-app-status-bar-style': 'default',
+    'apple-mobile-web-app-title': '有人要吗',
   },
   robots: {
     index: true,
@@ -76,9 +90,14 @@ export const metadata: Metadata = {
 }
 
 export const viewport: Viewport = {
-  themeColor: '#F4C300',
+  themeColor: [
+    { media: '(prefers-color-scheme: light)', color: '#F4C300' },
+    { media: '(prefers-color-scheme: dark)', color: '#0d0d0d' },
+  ],
   width: 'device-width',
   initialScale: 1,
+  // 全屏 standalone 模式下覆盖到刘海/打孔屏（iPhone X+）
+  viewportFit: 'cover',
 }
 
 export default function RootLayout({ children }: { children: React.ReactNode }) {
