@@ -1,7 +1,8 @@
 'use server'
 
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
 import { revalidatePath } from 'next/cache'
+import { pushToUser } from '@/lib/push/send'
 
 /**
  * 站内信 server actions。
@@ -87,6 +88,33 @@ export async function sendMessage(input: {
   }
   revalidatePath('/me/messages')
   revalidatePath(`/me/messages/${input.conversationId}`)
+
+  // 给对方推送（失败绝不阻塞发消息）
+  try {
+    const { data: conv } = await supabase
+      .from('conversations')
+      .select('buyer_id, seller_id')
+      .eq('id', input.conversationId)
+      .maybeSingle()
+    if (conv) {
+      const recipientId =
+        conv.buyer_id === user.id ? conv.seller_id : conv.buyer_id
+      const { data: senderProfile } = await supabase
+        .from('profiles')
+        .select('nickname')
+        .eq('id', user.id)
+        .maybeSingle()
+      await pushToUser(createServiceClient(), recipientId, {
+        title: senderProfile?.nickname || '新私信',
+        body: trimmed.slice(0, 80),
+        url: `/me/messages/${input.conversationId}`,
+        tag: `conv-${input.conversationId}`,
+      })
+    }
+  } catch {
+    // ignore push failure
+  }
+
   return { ok: true, message: data }
 }
 

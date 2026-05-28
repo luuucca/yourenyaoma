@@ -1,7 +1,8 @@
 'use server'
 
 import { revalidatePath } from 'next/cache'
-import { createClient } from '@/lib/supabase/server'
+import { createClient, createServiceClient } from '@/lib/supabase/server'
+import { pushToUser } from '@/lib/push/send'
 
 type Result = { ok?: true; error?: string }
 
@@ -64,6 +65,47 @@ export async function sendHangoutMessage(input: {
   if (error) {
     return { error: `发送失败: ${error.message}` }
   }
+
+  // 给群里除发送者外的所有成员推送（失败不阻塞发消息）
+  try {
+    const svc = createServiceClient()
+    const { data: hangout } = await svc
+      .from('hangouts')
+      .select('host_id, title')
+      .eq('id', input.hangoutId)
+      .maybeSingle()
+    const { data: parts } = await svc
+      .from('hangout_participants')
+      .select('user_id')
+      .eq('hangout_id', input.hangoutId)
+      .eq('status', 'joined')
+
+    const memberIds = new Set<string>()
+    if (hangout?.host_id) memberIds.add(hangout.host_id)
+    ;(parts || []).forEach((p: any) => memberIds.add(p.user_id))
+    memberIds.delete(user.id)
+
+    const { data: senderProfile } = await svc
+      .from('profiles')
+      .select('nickname')
+      .eq('id', user.id)
+      .maybeSingle()
+    const senderName = senderProfile?.nickname || '群友'
+
+    await Promise.all(
+      Array.from(memberIds).map((uid) =>
+        pushToUser(svc, uid, {
+          title: hangout?.title || '搭子群聊',
+          body: `${senderName}: ${trimmed.slice(0, 70)}`,
+          url: `/buddies/${input.hangoutId}`,
+          tag: `hangout-${input.hangoutId}`,
+        }),
+      ),
+    )
+  } catch {
+    // ignore push failure
+  }
+
   return { ok: true, message: data }
 }
 

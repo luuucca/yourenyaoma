@@ -2,6 +2,7 @@ import Link from 'next/link'
 import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/Button'
+import PushOptInButton from '@/components/pwa/PushOptInButton'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -164,6 +165,16 @@ export default async function MePage() {
           <span className="text-brand-muted">→</span>
         </Link>
       )}
+
+      <div className="card mt-3 p-4 flex items-center justify-between gap-3">
+        <div>
+          <div className="font-medium text-sm">消息推送</div>
+          <div className="text-xs text-brand-muted mt-0.5">
+            有新私信 / 群聊消息时通知你
+          </div>
+        </div>
+        <PushOptInButton />
+      </div>
 
       <form action="/auth/logout" method="POST" className="mt-6">
         <Button type="submit" variant="secondary" size="md" className="w-full">

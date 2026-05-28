@@ -4,6 +4,7 @@ import Header from '@/components/layout/Header'
 import Footer from '@/components/layout/Footer'
 import MobileNav from '@/components/layout/MobileNav'
 import ConsoleEasterEgg from '@/components/layout/ConsoleEasterEgg'
+import PushRegistrar from '@/components/pwa/PushRegistrar'
 import { ToastProvider } from '@/components/ui/Toast'
 import './globals.css'
 
@@ -106,6 +107,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
       <body className="min-h-screen bg-white text-brand-ink antialiased">
         <ToastProvider>
           <ConsoleEasterEgg />
+          <PushRegistrar />
           <Header />
           <main className="pb-20 md:pb-0">{children}</main>
           <Footer />
