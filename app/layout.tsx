@@ -5,6 +5,7 @@ import Footer from '@/components/layout/Footer'
 import MobileNav from '@/components/layout/MobileNav'
 import ConsoleEasterEgg from '@/components/layout/ConsoleEasterEgg'
 import PushRegistrar from '@/components/pwa/PushRegistrar'
+import AddToHomeHint from '@/components/pwa/AddToHomeHint'
 import { ToastProvider } from '@/components/ui/Toast'
 import './globals.css'
 
@@ -112,6 +113,7 @@ export default function RootLayout({ children }: { children: React.ReactNode }) 
           <main className="pb-20 md:pb-0">{children}</main>
           <Footer />
           <MobileNav />
+          <AddToHomeHint />
         </ToastProvider>
       </body>
     </html>
