@@ -7,7 +7,7 @@
  * 避免开发期缓存把新代码挡住。主要价值是 push。
  */
 
-const CACHE = 'yrym-v1'
+const CACHE = 'yrym-v2'
 const SHELL = ['/', '/offline']
 
 self.addEventListener('install', (event) => {
@@ -53,8 +53,9 @@ self.addEventListener('push', (event) => {
   const title = data.title || '有人要吗'
   const options = {
     body: data.body || '',
-    icon: '/icon-192.png',
-    badge: '/icon-192.png',
+    // ?v=2 强制绕过浏览器对旧「要」图标的 HTTP 缓存（换成橘猫后必须改 URL 才会重新拉）
+    icon: '/icon-192.png?v=2',
+    badge: '/icon-192.png?v=2',
     tag: data.tag || undefined, // 同 tag 的通知会合并，避免刷屏
     data: { url: data.url || '/' },
     vibrate: [80, 40, 80],
