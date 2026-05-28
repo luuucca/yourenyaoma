@@ -26,6 +26,7 @@ const COLUMNS: { label: string; links: { href: string; label: string }[] }[] = [
     label: '社区',
     links: [
       { href: '/about', label: '关于我们' },
+      { href: '/giveaway/rules', label: '抽奖福利' },
       { href: '/about#story', label: '社区故事' },
       { href: '/about#feedback', label: '意见反馈' },
     ],
