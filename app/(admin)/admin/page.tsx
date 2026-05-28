@@ -258,6 +258,7 @@ export default async function AdminPage() {
             countSuffix=" 封禁中"
           />
           <AdminCard href="/admin/logs" label="审核记录" icon="📋" />
+          <AdminCard href="/admin/giveaway" label="抽奖管理" icon="🎁" />
         </div>
       </section>
 

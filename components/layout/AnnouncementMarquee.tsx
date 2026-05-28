@@ -2,11 +2,11 @@
 // Original v1 simple form: straight (no tilt), yellow background, small black
 // text with dot separators. Pauses on hover; halted under prefers-reduced-motion.
 const MESSAGES = [
-  '海外华人邻里社区 · 闲置 · 师傅 · 搭子',
-  '搬家季 · 5 月专题 · 整屋打包好物上线',
-  '找师傅 · 30+ 认证师傅入驻 · 中德双语沟通',
-  '找搭子 · 本周活动 12 场 · 球友 / 饭搭子 / 车队',
-  '免费送频道今日新增 12 件 · 邻居好意',
+  '🎁 新邻居福利 · 注册并成功发布闲置即可参与抽奖 · 详见 /giveaway/rules',
+  '海外华人邻里社区 · 闲置 · 师傅 · 搭子 · 找工作',
+  '搬家季 · 整屋打包好物上线 · 包圆 / 单件都行',
+  '找师傅 · 认证师傅入驻 · 中德双语沟通',
+  '找搭子 · 加入活动自动进群聊 · 球友 / 饭搭子 / 车队',
   '安全交易 · 站内 IM + 公共场所交付 + 双向评价',
 ]
 
