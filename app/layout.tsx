@@ -66,11 +66,11 @@ export const metadata: Metadata = {
     images: ['/og.png'],
   },
   icons: {
-    // SVG for modern browsers (auto-resize)
+    // 浏览器标签页用「要」字 SVG（小尺寸下比猫咪图清晰）
     icon: [{ url: '/favicon.svg', type: 'image/svg+xml' }],
-    // iOS / iPadOS home-screen icon — Next.js auto-generates from
-    // app/apple-icon.tsx, but we override here explicitly for clarity
-    apple: [{ url: '/apple-icon', sizes: '180x180' }],
+    // iOS 主屏图标 = 橘猫抱鱼（public/apple-touch-icon.png）
+    // 显式声明 icons 会关闭 Next.js 文件自动检测，所以这里必须手写
+    apple: [{ url: '/apple-touch-icon.png', sizes: '180x180', type: 'image/png' }],
   },
   // PWA: 让 iOS Safari 把站点当 standalone app
   appleWebApp: {
