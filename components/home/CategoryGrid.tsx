@@ -19,13 +19,13 @@ const STRIP = [
 
 export default function CategoryGrid() {
   return (
-    <section className="max-w-[1360px] mx-auto px-4 md:px-16 pt-3 pb-12 flex items-center justify-between gap-4 overflow-x-auto no-scrollbar">
+    <section className="max-w-[1360px] mx-auto px-4 md:px-16 pt-3 pb-12 grid grid-cols-5 gap-y-5 gap-x-1 justify-items-center md:flex md:items-center md:justify-between md:gap-4 md:overflow-x-auto no-scrollbar">
       {STRIP.map((item, i) => {
         return (
           <ScrollReveal key={`${item.img}-${item.label}`} delay={i * 55} distance={12}>
             <Link
               href={item.href}
-              className="group flex flex-col items-center gap-2.5 min-w-[64px] transition-transform hover:-translate-y-1 active:translate-y-0 duration-200"
+              className="group flex flex-col items-center gap-2.5 md:min-w-[64px] transition-transform hover:-translate-y-1 active:translate-y-0 duration-200"
             >
               <div className="w-[60px] h-[60px] rounded-2xl flex items-center justify-center transition-all overflow-hidden bg-brand-cream border border-brand-line group-hover:border-brand-ink">
                 {/* PNG wiggles slightly on hover — wakes up the illustrations */}
@@ -47,7 +47,7 @@ export default function CategoryGrid() {
       <ScrollReveal delay={STRIP.length * 55} distance={12}>
         <Link
           href="/browse"
-          className="group flex flex-col items-center gap-2.5 min-w-[64px] hover:-translate-y-1 active:translate-y-0 transition-transform duration-200"
+          className="group flex flex-col items-center gap-2.5 md:min-w-[64px] hover:-translate-y-1 active:translate-y-0 transition-transform duration-200"
         >
           <div className="w-[60px] h-[60px] rounded-2xl flex items-center justify-center bg-brand-yellow-soft border border-brand-yellow-line text-[18px] text-brand-ink-soft transition-all group-hover:border-brand-yellow">
             <span className="transition-transform duration-300 group-hover:rotate-90">···</span>

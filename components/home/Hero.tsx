@@ -7,8 +7,8 @@ const HOT_SEARCHES = ['IKEA 沙发', '搬家甩卖', '自行车', 'MacBook', '�
 
 export default function Hero() {
   return (
-    <section className="max-w-[1360px] mx-auto px-4 md:px-16 pt-12 md:pt-[72px] pb-8 grid md:grid-cols-[1.1fr_0.9fr] gap-10 md:gap-14 items-center">
-      {/* LEFT */}
+    <section className="max-w-[1360px] mx-auto px-4 md:px-16 pt-12 md:pt-[72px] pb-8 grid md:grid-cols-[1.1fr_0.9fr] gap-y-8 md:gap-y-9 md:gap-x-14 items-center">
+      {/* 标题块 — 手机端第一屏先看到文案 */}
       <div>
         <div className="font-mono text-[12px] tracking-[0.18em] text-brand-muted uppercase mb-7 font-medium">
           OVERSEAS · 海外华人邻里社区
@@ -46,12 +46,20 @@ export default function Hero() {
             />
           </span>
         </h1>
+      </div>
 
+      {/* 视频 — 手机端紧跟标题（搜索框上方），桌面端在右侧竖跨两行居中 */}
+      <div className="md:row-span-2 md:self-center">
+        <HeroVideoCycler />
+      </div>
+
+      {/* 搜索 + 热搜块 */}
+      <div>
         {/* search */}
         <form
           action="/browse"
           role="search"
-          className="mt-9 flex items-center border border-brand-ink rounded-pill pl-6 pr-1.5 py-1.5 max-w-[520px] bg-white focus-within:ring-2 focus-within:ring-brand-yellow focus-within:ring-offset-2"
+          className="flex items-center border border-brand-ink rounded-pill pl-6 pr-1.5 py-1.5 max-w-[520px] bg-white focus-within:ring-2 focus-within:ring-brand-yellow focus-within:ring-offset-2"
         >
           <label htmlFor="hero-search" className="sr-only">
             搜索闲置 · 师傅 · 搭子
@@ -116,9 +124,6 @@ export default function Hero() {
           })}
         </div>
       </div>
-
-      {/* RIGHT — 视频循环播放器，按顺序播完一个切下一个 */}
-      <HeroVideoCycler />
     </section>
   )
 }
