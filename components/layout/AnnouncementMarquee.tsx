@@ -1,8 +1,8 @@
+import { createClient } from '@/lib/supabase/server'
+
 // Yellow announcement marquee — sits at the top of every page above the nav.
-// Original v1 simple form: straight (no tilt), yellow background, small black
-// text with dot separators. Pauses on hover; halted under prefers-reduced-motion.
-const MESSAGES = [
-  '🎁 新邻居福利 · 注册并成功发布闲置即可参与抽奖 · 详见 /giveaway/rules',
+// 抽奖文案只在真的有进行中抽奖时才出现（动态查 giveaways）；其余文案常驻。
+const BASE_MESSAGES = [
   '海外华人邻里社区 · 闲置 · 师傅 · 搭子 · 找工作',
   '搬家季 · 整屋打包好物上线 · 包圆 / 单件都行',
   '找师傅 · 认证师傅入驻 · 中德双语沟通',
@@ -10,9 +10,30 @@ const MESSAGES = [
   '安全交易 · 站内 IM + 公共场所交付 + 双向评价',
 ]
 
-export default function AnnouncementMarquee() {
+export default async function AnnouncementMarquee() {
+  // 有进行中的抽奖才在头条喊一句（带上奖品名，更有吸引力）
+  let messages = [...BASE_MESSAGES]
+  try {
+    const supabase = createClient()
+    const { data: active } = await supabase
+      .from('giveaways')
+      .select('prize')
+      .eq('status', 'active')
+      .order('ends_at', { ascending: true })
+      .limit(1)
+      .maybeSingle()
+    if (active?.prize) {
+      messages = [
+        `🎁 新邻居福利 · 注册并发布闲置即可抽 ${active.prize} · 详见 /giveaway/rules`,
+        ...BASE_MESSAGES,
+      ]
+    }
+  } catch {
+    // 查询失败就用基础文案，不影响渲染
+  }
+
   // Duplicate the list so the marquee loops seamlessly.
-  const items = [...MESSAGES, ...MESSAGES]
+  const items = [...messages, ...messages]
   return (
     <div
       role="marquee"
