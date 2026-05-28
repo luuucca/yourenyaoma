@@ -24,8 +24,8 @@ export default function HeroVideoCycler() {
   // 给四边各羽化 14px 到透明 → 边缘透出页面白(#fff，与视频边缘同色)，接缝彻底消失。
   // 用两层 linear-gradient 交集，只羽化外缘，中心 100% 清晰、不切主体。
   const feather =
-    'linear-gradient(to right, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%), ' +
-    'linear-gradient(to bottom, transparent 0, #000 14px, #000 calc(100% - 14px), transparent 100%)'
+    'linear-gradient(to right, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%), ' +
+    'linear-gradient(to bottom, transparent 0, #000 24px, #000 calc(100% - 24px), transparent 100%)'
 
   return (
     <div className="relative aspect-video">

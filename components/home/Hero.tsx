@@ -28,7 +28,9 @@ export default function Hero() {
             from={{ opacity: 0, y: 40 }}
             to={{ opacity: 1, y: 0 }}
             textAlign="left"
-            className="!block"
+            /* pb 给低位中文逗号「，」留出空间 — 否则被 SplitText 的
+               overflow-hidden + leading-[0.98] 裁掉一半 */
+            className="!block pb-[0.16em]"
           />
           <span className="hero-highlight inline-block">
             <SplitText
