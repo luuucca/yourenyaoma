@@ -10,7 +10,7 @@ import { useState } from 'react'
  * 要换视频：编辑 VIDEOS。文件放 public/ 下，路径加前导 `/`。
  */
 
-const VIDEOS = ['/HERONEW.mp4']
+const VIDEOS = ['/HERONEW.mp4', '/HERONEW2.mp4']
 
 export default function HeroVideoCycler() {
   const [index, setIndex] = useState(0)
