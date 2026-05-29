@@ -1,4 +1,3 @@
-import Image from 'next/image'
 import ProsSection from '@/components/home/ProsSection'
 
 export const metadata = {
@@ -9,29 +8,16 @@ export const metadata = {
 export default function ProsPage() {
   return (
     <main className="pt-6 pb-20">
-      <div className="max-w-[1360px] mx-auto px-4 md:px-16 pt-8 pb-2 flex flex-col md:flex-row md:items-center gap-6 md:gap-10">
-        <div className="md:flex-1">
-          <span className="font-mono text-[11px] tracking-[0.18em] uppercase text-brand-muted">
-            PROS · 找师傅
-          </span>
-          <h1 className="font-serif text-[40px] md:text-[56px] font-semibold tracking-[-0.02em] text-brand-ink mt-3 mb-3">
-            找师傅
-          </h1>
-          <p className="text-[15px] text-[#555] max-w-[640px] leading-[1.6]">
-            法定翻译、搬家、家电维修、装修、月嫂、中医——海外华人最常找的几件事，资质审核 · 明码标价 · 中德双语。
-          </p>
-        </div>
-        {/* 师傅上门动图 —— 桌面在标题右侧，手机叠到标题下方 */}
-        <div className="w-full md:w-[440px] shrink-0 rounded-2xl overflow-hidden border border-brand-line bg-brand-cream">
-          <Image
-            src="/pros-hero.webp"
-            alt="师傅上门服务"
-            width={800}
-            height={450}
-            unoptimized
-            className="block w-full h-auto"
-          />
-        </div>
+      <div className="max-w-[1360px] mx-auto px-4 md:px-16 pt-8 pb-2">
+        <span className="font-mono text-[11px] tracking-[0.18em] uppercase text-brand-muted">
+          PROS · 找师傅
+        </span>
+        <h1 className="font-serif text-[40px] md:text-[56px] font-semibold tracking-[-0.02em] text-brand-ink mt-3 mb-3">
+          找师傅
+        </h1>
+        <p className="text-[15px] text-[#555] max-w-[640px] leading-[1.6]">
+          法定翻译、搬家、家电维修、装修、月嫂、中医——海外华人最常找的几件事，资质审核 · 明码标价 · 中德双语。
+        </p>
       </div>
       <ProsSection />
 

@@ -11,11 +11,11 @@ import { useState } from 'react'
  * （iOS / 部分移动端 remount 后偶尔不自动播）。onError 直接跳下一个，
  * 避免某个文件解码失败把整个轮播卡死。
  *
- * 注意：HERONEW.mp4 约 15s、HERONEW2.mp4 约 10s —— 是「播完再切」不是同时播，
- * 所以第二个视频要等第一个放完才出现。要换视频：编辑 VIDEOS（路径加前导 `/`）。
+ * 注意：当前只放 HERONEW.mp4，单视频走原生 loop 无缝循环。
+ * 要加视频就往 VIDEOS 里追加文件名（路径加前导 `/`），会自动变成顺序轮播。
  */
 
-const VIDEOS = ['/HERONEW.mp4', '/HERONEW2.mp4']
+const VIDEOS = ['/HERONEW.mp4']
 
 export default function HeroVideoCycler() {
   const [index, setIndex] = useState(0)
