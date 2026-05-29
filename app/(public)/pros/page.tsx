@@ -24,7 +24,7 @@ export default function ProsPage() {
         {/* 师傅上门动图 —— 桌面在标题右侧，手机叠到标题下方 */}
         <div className="w-full md:w-[440px] shrink-0 rounded-2xl overflow-hidden border border-brand-line bg-brand-cream">
           <Image
-            src="/pros-hero.gif"
+            src="/pros-hero.webp"
             alt="师傅上门服务"
             width={800}
             height={450}
