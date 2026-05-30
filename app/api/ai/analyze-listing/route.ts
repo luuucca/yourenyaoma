@@ -67,19 +67,26 @@ export async function POST(req: NextRequest) {
     return Response.json({ error: `下载图片出错: ${e.message}` }, { status: 502 })
   }
 
-  // 拼可用类别列表给 Gemini 看
-  const categoryList = CATEGORIES.map((c) => `${c.id}(${c.label})`).join(', ')
+  // AI 只在「真实品类」里选 —— 排除 free(由价格=0决定) / moving(打包流程) 这两个非品类
+  const aiCategories = CATEGORIES.filter((c) => c.id !== 'free' && c.id !== 'moving')
+  // 每类带 hint(边界关键词)，帮 Gemini 在语义相近的分类间选对
+  const categoryList = aiCategories.map((c) => `- ${c.id}（${c.label}）：${c.hint}`).join('\n')
 
   const prompt = `你是「有人要吗」海外华人二手交易平台的智能助手。看这张物品照片，识别后只返回一个 JSON 对象，不要任何额外文字或 markdown：
 
 {
-  "category": "从这个列表里选 1 个 id (只填 id 不填中文): ${categoryList}",
+  "category": "下面分类列表里最匹配的 1 个 id（只填英文 id，不填中文）",
   "title": "10-25 字的中文标题。要写品牌/型号(如能看出)、状况(几成新)、关键卖点。不要废词('出售/转让/出/求')。例如: 'IKEA POÄNG 单人沙发椅，9成新', 'MacBook Pro 13寸 M1 2020 8G+256G'",
   "estimated_price_eur": 如果是常见品牌物可估个数字(整数欧元)，否则填 null,
   "tags": ["最多 4 个 2-4 字的中文短标签，比如 ['宜家','沙发','北欧']"]
 }
 
-务必：JSON 解析必须成功。category 必须是上面 id 之一。不要回答任何其他东西。`
+可选分类（务必从中选 id，参考每个 label 后的说明来区分相近分类）：
+${categoryList}
+
+易混提醒：教材/课本/考试资料→study（不是 books）；锅具/电饭煲/微波炉/咖啡机→kitchen（不是 appliance）；笔记本/显示器/键鼠/打印机→computer（不是 digital）；门票/健身卡/交通卡/礼品卡→tickets。实在无法归类才用 other。
+
+务必：JSON 解析必须成功。category 必须是上面列表里的 id。不要回答任何其他东西。`
 
   try {
     const ai = new GoogleGenerativeAI(apiKey)
@@ -106,8 +113,8 @@ export async function POST(req: NextRequest) {
       parsed = JSON.parse(match[0])
     }
 
-    // 校验 + 清洗
-    const validCategoryIds = CATEGORIES.map((c) => c.id) as readonly string[]
+    // 校验 + 清洗（与提示词同源：只认排除 free/moving 后的真实品类）
+    const validCategoryIds = aiCategories.map((c) => c.id) as readonly string[]
     const category =
       typeof parsed.category === 'string' && validCategoryIds.includes(parsed.category)
         ? parsed.category
