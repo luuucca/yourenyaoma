@@ -12,6 +12,7 @@ import OfferChain, { type ChainOffer } from '@/components/listing/OfferChain'
 import { MyListingActions } from '@/components/user/MyListingActions'
 import { Badge } from '@/components/ui/Badge'
 import { Button } from '@/components/ui/Button'
+import Avatar from '@/components/ui/Avatar'
 import { formatPrice } from '@/lib/utils/formatPrice'
 import { formatRelativeTime } from '@/lib/utils/formatDate'
 import { CATEGORY_LABEL } from '@/lib/constants/categories'
@@ -300,9 +301,7 @@ export default async function ListingDetailPage({
       <section className="card p-5 md:col-start-2 md:row-start-2">
         <div className="text-sm font-semibold mb-3">卖家</div>
         <div className="flex items-center gap-3">
-          <div className="w-10 h-10 rounded-full bg-brand-yellow-soft flex items-center justify-center text-lg font-medium">
-            {seller?.nickname?.[0] ?? '?'}
-          </div>
+          <Avatar src={seller?.avatar_url} name={seller?.nickname} size={40} />
           <div>
             <div className="font-medium text-sm">{seller?.nickname}</div>
             {seller?.district && (

@@ -8,6 +8,7 @@ import { useToast } from '@/components/ui/Toast'
 import { DISTRICTS } from '@/lib/constants/districts'
 import { profileSchema } from '@/lib/validations/profile'
 import { createClient } from '@/lib/supabase/client'
+import AvatarUploader from '@/components/user/AvatarUploader'
 
 export function ProfileEditForm({
   initial,
@@ -21,13 +22,15 @@ export function ProfileEditForm({
     district?: string | null
     wechat?: string | null
     whatsapp?: string | null
+    avatar_url?: string | null
   } | null
   nextPath?: string | null
   requireContact?: boolean
 }) {
   const router = useRouter()
   const { show } = useToast()
-  const [nickname, setNickname] = useState(initial?.nickname ?? '')
+  // 昵称注册后锁定，只读展示，不参与提交
+  const nickname = initial?.nickname ?? ''
   const [district, setDistrict] = useState(initial?.district ?? '')
   const [wechat, setWechat] = useState(initial?.wechat ?? '')
   const [whatsapp, setWhatsapp] = useState(initial?.whatsapp ?? '')
@@ -48,8 +51,8 @@ export function ProfileEditForm({
       return
     }
 
-    const result = profileSchema.safeParse({
-      nickname,
+    // 昵称锁定，不校验/不提交；只验可编辑字段
+    const result = profileSchema.omit({ nickname: true }).safeParse({
       district: district || undefined,
       wechat,
       whatsapp,
@@ -71,10 +74,10 @@ export function ProfileEditForm({
       setLoading(false)
       return
     }
+    // 注意：不提交 nickname —— 注册后锁定，DB 触发器也会拒绝改动
     const { error } = await supabase
       .from('profiles')
       .update({
-        nickname,
         district: district || null,
         wechat: wechat || null,
         whatsapp: whatsapp || null,
@@ -92,13 +95,23 @@ export function ProfileEditForm({
 
   return (
     <form onSubmit={onSubmit} className="space-y-4 card p-6">
-      <Input
-        label="昵称"
-        value={nickname}
-        onChange={(e) => setNickname(e.target.value)}
-        error={errors.nickname}
-        maxLength={24}
-      />
+      {/* 头像 —— 即时上传保存 */}
+      <AvatarUploader initialUrl={initial?.avatar_url} nickname={nickname} />
+
+      {/* 昵称 —— 注册后锁定，只读 */}
+      <div>
+        <label className="block text-sm font-medium mb-1.5">
+          昵称
+          <span className="ml-2 text-[11px] font-normal text-brand-muted">注册后不可修改</span>
+        </label>
+        <div className="flex items-center gap-2 rounded-xl border border-brand-line bg-brand-cream px-3.5 py-2.5 text-[15px] text-brand-ink-soft">
+          <svg width="14" height="14" viewBox="0 0 24 24" fill="none" className="shrink-0 text-brand-muted" aria-hidden>
+            <rect x="5" y="11" width="14" height="9" rx="2" stroke="currentColor" strokeWidth="2" />
+            <path d="M8 11V8a4 4 0 0 1 8 0v3" stroke="currentColor" strokeWidth="2" />
+          </svg>
+          <span className="truncate">{nickname || '—'}</span>
+        </div>
+      </div>
       <Select
         label="所在区"
         value={district}

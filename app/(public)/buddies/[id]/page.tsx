@@ -6,6 +6,7 @@ import HostAgendaEditor from '@/components/publish/HostAgendaEditor'
 import HostCancelButton from '@/components/publish/HostCancelButton'
 import HangoutCover from '@/components/listing/HangoutCover'
 import { HangoutChat } from '@/components/messaging/HangoutChat'
+import Avatar from '@/components/ui/Avatar'
 import { pickHangoutCover } from '@/lib/utils/hangoutCover'
 
 export const dynamic = 'force-dynamic'
@@ -181,9 +182,7 @@ export default async function HangoutDetailPage({ params }: { params: { id: stri
                 key={p.user_id}
                 className="inline-flex items-center gap-2 px-3 py-1.5 rounded-pill border border-brand-line bg-white text-[13px]"
               >
-                <span className="w-6 h-6 rounded-full bg-brand-yellow-soft border border-brand-yellow-line flex items-center justify-center text-[11px] font-medium text-brand-ink">
-                  {(p.profiles?.nickname ?? '?').charAt(0)}
-                </span>
+                <Avatar src={p.profiles?.avatar_url} name={p.profiles?.nickname} size={24} />
                 {p.profiles?.nickname ?? '邻居'}
               </span>
             ))}

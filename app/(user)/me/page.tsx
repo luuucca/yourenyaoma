@@ -3,6 +3,7 @@ import { redirect } from 'next/navigation'
 import { createClient } from '@/lib/supabase/server'
 import { Button } from '@/components/ui/Button'
 import PushOptInButton from '@/components/pwa/PushOptInButton'
+import Avatar from '@/components/ui/Avatar'
 
 export const dynamic = 'force-dynamic'
 export const revalidate = 0
@@ -63,9 +64,7 @@ export default async function MePage() {
     <div className="container-page py-6 max-w-2xl">
       <div className="card p-6">
         <div className="flex items-center gap-4">
-          <div className="w-16 h-16 rounded-full bg-brand-yellow-soft flex items-center justify-center text-2xl font-medium">
-            {profile?.nickname?.[0] ?? '?'}
-          </div>
+          <Avatar src={profile?.avatar_url} name={profile?.nickname} size={64} />
           <div className="flex-1 min-w-0">
             <div className="font-semibold">{profile?.nickname}</div>
             <div className="text-xs text-brand-muted truncate">{user.email}</div>
